@@ -42,12 +42,14 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    output = ROOT / 'ai-direct.conf'
+    output = ROOT / 'kidstudio.conf'
     text = build()
     if args.check:
         assert output.read_text() == text, 'Regenerate with python3 scripts/build.py'
+        assert (ROOT / 'ai-direct.conf').read_text() == text, 'Legacy URL alias is stale'
         print('Generated configuration matches sources')
     else:
         output.write_text(text)
+        (ROOT / 'ai-direct.conf').write_text(text)  # Keep existing imported URLs working.
         print(f'Built {output.name}: {len(text.encode())} bytes')
 

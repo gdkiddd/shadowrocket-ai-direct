@@ -14,7 +14,7 @@ spec.loader.exec_module(builder)
 class ConfigTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.text = (ROOT / 'ai-direct.conf').read_text()
+        cls.text = (ROOT / 'kidstudio.conf').read_text()
         cls.rules = [l for l in cls.text.split('[Rule]\n')[1].split('[Host]')[0].splitlines()
                      if l and not l.startswith('#')]
 
@@ -36,6 +36,29 @@ class ConfigTests(unittest.TestCase):
 
     def test_reproducible(self):
         self.assertEqual(self.text, builder.build())
+        self.assertEqual(self.text, (ROOT / 'ai-direct.conf').read_text())
+
+    def test_extended_google_ai(self):
+        for host in ['antigravity.google', 'antigravity-unleash.goog',
+                     'deepmind.google', 'notebooklm.google', 'notebooklm.google.com',
+                     'labs.google', 'voice.telephony.goog']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'AI')
+                self.assertEqual(self.route('api.' + host), 'AI')
+                self.assertEqual(self.route(host + '.example.org'), 'PROXY')
+
+    def test_domestic_ai(self):
+        for host in ['api.deepseek.com', 'www.kimi.com', 'api.moonshot.ai',
+                     'api.minimaxi.com', 'api.minimax.io', 'hailuoai.video',
+                     'api.z.ai', 'open.bigmodel.cn', 'chatglm.cn', 'qwen.ai',
+                     'qwenlm.ai', 'dashscope.aliyuncs.com', 'www.doubao.com',
+                     'www.coze.cn', 'www.coze.com', 'jimeng.jianying.com',
+                     'yiyan.baidu.com', 'qianfan.baidubce.com', 'yuanbao.tencent.com',
+                     'hunyuan.tencent.com', 'spark-api.xf-yun.com',
+                     'api.baichuan-ai.com', 'api.lingyiwanwu.com',
+                     'api.stepfun.com', 'sensenova.cn', 'tiangong.cn', 'klingai.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'DIRECT')
 
     def test_core_ai_before_direct(self):
         for host in ['chatgpt.com', 'ws.chatgpt.com', 'api.openai.com',

@@ -9,8 +9,10 @@
 滚动更新地址（`main`）：
 
 ```text
-https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/ai-direct.conf
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.conf
 ```
+
+旧版 `ai-direct.conf` URL 保留为同内容兼容入口；新导入统一使用 `kidstudio.conf`。
 
 首次使用建议先阅读本页，再从 [Releases](https://github.com/gdkiddd/shadowrocket-ai-direct/releases) 获取固定版本。GitHub Raw 不可达时，可以在已具备可用代理的环境下载，或在 Releases 下载后通过系统分享菜单导入；不需要使用不明镜像。
 
@@ -28,7 +30,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/ai-direct.
 
 1. **备份原配置。** 在 Shadowrocket 中保留旧文件。新配置有问题时直接切回旧文件，不要删除原订阅。
 2. **准备两个通用节点别名。** 先导入你自己的节点订阅，再为选定节点创建本地副本，将名称分别设为 `AI-NODE` 和 `PROXY-NODE`，大小写完全一致。AI 节点应有稳定、适用的出口并支持 TCP；需要语音时还需支持 UDP。两个别名可以指向同一服务端，但仍需要两个命名记录。订阅刷新可能重置订阅内名称，优先使用本地副本，并自行同步失效的凭证。
-3. **导入配置 URL。** 底部“配置”→ 右上角“＋”→ 填入上面的 Raw 地址并下载；点击下载后的 `ai-direct.conf` →“使用配置”。不要把配置 URL 填进首页的节点订阅栏。
+3. **导入配置 URL。** 底部“配置”→ 右上角“＋”→ 填入上面的 Raw 地址并下载；点击下载后的 `kidstudio.conf` →“使用配置”。不要把配置 URL 填进首页的节点订阅栏。
 4. **选择分组。** 在首页代理分组中将 `AI` 选为 `AI-NODE`，将 `PROXY` 选为 `PROXY-NODE`。模板两组都预设为 `REJECT`，避免未配置时误选其他出口。若看不到节点，先修正节点名称再重新编译/使用配置。
 5. **全局路由选“配置”。** 首页默认节点也选一个有效代理，建议 `PROXY-NODE`；带 `#proxy` 的 DNS 使用代理解析路径，不能仅凭分组名称断言它一定跟随 AI 组。
 6. **开启 UDP 规则转发。** “设置”→“UDP”→“启用转发”打开，允许端口留空。关闭它会让 UDP 绕过配置直连。这是每台设备的应用设置，导入 `.conf` 不会自动开启。
@@ -82,10 +84,16 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/ai-direct.
 
 - ChatGPT 网页/应用、OpenAI API、Codex 与 Sora 的核心域名、上传与静态资源、部分认证/支付/挑战资源、官方语音 IPv4 快照。
 - Claude 网页/应用、Anthropic API 与 Claude Code 相关核心域名。
-- Gemini 网页、AI Studio、Gemini API、CLI 入口与 Google 登录相关域名。
+- Gemini 网页、AI Studio、Gemini API、CLI 入口、Google 登录，以及 Antigravity、DeepMind、NotebookLM、Google Labs 和语音相关域名。
 - 常见国内网站/应用 CDN 及微软 Office、Outlook、登录、下载和更新的直连例外。
 
 共享域名会影响其他使用同一域名的服务，例如 Google 登录、Cloudflare 验证、Stripe 脚本。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 AI 组**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
+
+### 国内 AI 直连策略
+
+已知国内 AI 服务统一使用 DIRECT：DeepSeek、Kimi / Moonshot、MiniMax / 海螺、智谱 / GLM / Z.ai、通义 / Qwen、豆包 / 扣子 / 即梦、文心、腾讯混元 / 元宝、讯飞星火、百川、零一万物、阶跃、商汤日日新、天工、可灵。网页、API 和已知资源域名采用后缀规则，清单见 `rules/direct.list`。国内厂商的国际站（如 Z.ai、Coze）也按本策略直连，但其海外部署可能导致连接失败或较慢；必要时由使用者在自己的 Fork 中调整。
+
+“全部直连”是路由策略，无法自动识别尚未收录的新品牌或新资源域名；发现遗漏后按实际域名补充，不用宽泛 AI 关键词判断国别。
 
 ## 验收与排错
 
@@ -118,7 +126,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/ai-direct.
 仓库结构：
 
 ```text
-ai-direct.conf                可导入的长配置文件
+kidstudio.conf                可导入的长配置文件
 data/base.conf                通用设置和两组通用节点别名
 data/china-domains.txt         带归属信息的固定国内域名快照
 data/openai-voice-cidrs.txt    官方语音 IPv4 快照
@@ -135,7 +143,7 @@ python3 scripts/build.py --check
 python3 -m unittest discover -s test -v
 ```
 
-修改源文件后重新生成 `ai-direct.conf`，提交源文件与产物。CI 只做静态回归，不连接真实节点，也不等于 iOS/macOS 实机验收。首个公开模板未替换任何现有设备的配置；使用者需要按上面的步骤完成自己网络环境的验收。
+修改源文件后重新生成 `kidstudio.conf`，提交源文件与产物。CI 只做静态回归，不连接真实节点，也不等于 iOS/macOS 实机验收。首个公开模板未替换任何现有设备的配置；使用者需要按上面的步骤完成自己网络环境的验收。
 
 提交 Issue 时只提供公开域名、脱敏的规则命中结果、系统/客户端版本和复现步骤。不要上传个人配置、订阅链接、凭证或原始流量。来源、固定版本和许可证详见 [SOURCES.md](SOURCES.md)。
 

@@ -63,3 +63,12 @@ DOMAIN,accounts.google.com
 DOMAIN,oauth2.googleapis.com
 DOMAIN,openidconnect.googleapis.com
 
+
+# Extended Google AI uses the same AI egress.
+DOMAIN-SUFFIX,antigravity.google
+DOMAIN-SUFFIX,antigravity-unleash.goog
+DOMAIN-SUFFIX,deepmind.google
+DOMAIN-SUFFIX,notebooklm.google
+DOMAIN-SUFFIX,notebooklm.google.com
+DOMAIN-SUFFIX,labs.google
+DOMAIN-SUFFIX,voice.telephony.goog

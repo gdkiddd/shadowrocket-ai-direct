@@ -11,6 +11,35 @@ DOMAIN-SUFFIX,tongyi.com
 DOMAIN-SUFFIX,doubao.com
 DOMAIN-SUFFIX,volcengine.com
 DOMAIN-SUFFIX,xiaohongshu.com
+# Domestic AI providers: web, API and known resource domains.
+DOMAIN-SUFFIX,deepseek.cn
+DOMAIN-SUFFIX,moonshot.cn
+DOMAIN-SUFFIX,minimax.chat
+DOMAIN-SUFFIX,hailuoai.com
+DOMAIN-SUFFIX,hailuoai.video
+DOMAIN-SUFFIX,bigmodel.cn
+DOMAIN-SUFFIX,zhipuai.cn
+DOMAIN-SUFFIX,chatglm.cn
+DOMAIN-SUFFIX,z.ai
+DOMAIN-SUFFIX,qwenlm.ai
+DOMAIN-SUFFIX,aliyuncs.com
+DOMAIN-SUFFIX,coze.cn
+DOMAIN-SUFFIX,coze.com
+DOMAIN-SUFFIX,jianying.com
+DOMAIN-SUFFIX,baidu.com
+DOMAIN-SUFFIX,baidubce.com
+DOMAIN-SUFFIX,tencent.com
+DOMAIN-SUFFIX,hunyuan.com
+DOMAIN-SUFFIX,xf-yun.com
+DOMAIN-SUFFIX,xfyun.cn
+DOMAIN-SUFFIX,iflytek.com
+DOMAIN-SUFFIX,baichuan-ai.com
+DOMAIN-SUFFIX,lingyiwanwu.com
+DOMAIN-SUFFIX,stepfun.com
+DOMAIN-SUFFIX,sensenova.cn
+DOMAIN-SUFFIX,sensetime.com
+DOMAIN-SUFFIX,tiangong.cn
+DOMAIN-SUFFIX,klingai.com
 # Microsoft productivity, authentication and downloads: direct-first exceptions.
 DOMAIN-SUFFIX,office.com
 DOMAIN-SUFFIX,office.net

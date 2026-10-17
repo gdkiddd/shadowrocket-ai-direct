@@ -31,5 +31,5 @@
 
 `data/sources.json` 保存国内表的固定提交和 SHA-256。升级时先核对上游许可证及差异，更新本地快照和摘要，再运行构建与测试。不会定时自动抓取并发布未经审查的上游变化。
 
-`rules/ai.list`、`rules/direct.list`、`data/base.conf` 是可审查源文件；`ai-direct.conf` 是可直接导入的合并产物。维护记录以 Git 提交和 Release 为准。
+`rules/ai.list`、`rules/direct.list`、`data/base.conf` 是可审查源文件；`kidstudio.conf` 是可直接导入的合并产物。维护记录以 Git 提交和 Release 为准。
 
