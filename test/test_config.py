@@ -66,6 +66,8 @@ class ConfigTests(unittest.TestCase):
                      'claude.ai', 'api.anthropic.com', 'platform.claude.com',
                      'gemini.google.com', 'generativelanguage.googleapis.com',
                      'cloudcode-pa.googleapis.com', 'accounts.google.com',
+                     'antigravity.google.com', 'aiplatform.googleapis.com',
+                     'oauth2.mtls.googleapis.com',
                      'challenges.cloudflare.com']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), 'AI')

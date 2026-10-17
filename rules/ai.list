@@ -54,6 +54,7 @@ DOMAIN-SUFFIX,makersuite.google.com
 DOMAIN-SUFFIX,generativeai.google
 DOMAIN-SUFFIX,generativelanguage.googleapis.com
 DOMAIN,cloudcode-pa.googleapis.com
+DOMAIN,aiplatform.googleapis.com
 DOMAIN,alkalicore-pa.clients6.google.com
 DOMAIN,alkalimakersuite-pa.clients6.google.com
 DOMAIN,proactivebackend-pa.googleapis.com
@@ -61,11 +62,13 @@ DOMAIN,geller-pa.googleapis.com
 # Shared Google authentication: affects non-AI Google logins too
 DOMAIN,accounts.google.com
 DOMAIN,oauth2.googleapis.com
+DOMAIN,oauth2.mtls.googleapis.com
 DOMAIN,openidconnect.googleapis.com
 
 
 # Extended Google AI uses the same AI egress.
 DOMAIN-SUFFIX,antigravity.google
+DOMAIN,antigravity.google.com
 DOMAIN-SUFFIX,antigravity-unleash.goog
 DOMAIN-SUFFIX,deepmind.google
 DOMAIN-SUFFIX,notebooklm.google
