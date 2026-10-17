@@ -1,0 +1,15 @@
+{
+  "checked_at": "2026-10-17",
+  "china": {
+    "repository": "https://github.com/blackmatrix7/ios_rule_script",
+    "revision": "933875d42861a7fdfd9f945cd18605d74fa7e943",
+    "path": "rule/Shadowrocket/China/China_Domain.list",
+    "license": "GPL-2.0-only",
+    "sha256": "d35eec789ae09a6d2b6dd48ed2c52d6d811f433b1e73a92b2f9246b778fa7923"
+  },
+  "voice": {
+    "url": "https://openai.com/chatgpt-voice.json",
+    "creationTime": "2026-03-26T20:12:45.451356+00:00",
+    "sha256": "8f03f3c594165eeff009915c7e2beb4bdfb9d429fb1955c205e3b33ec781899a"
+  }
+}
