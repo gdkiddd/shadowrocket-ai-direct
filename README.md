@@ -35,9 +35,18 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 5. **全局路由选“配置”。** 首页默认节点也选一个有效代理，建议 `PROXY-NODE`；带 `#proxy` 的 DNS 使用代理解析路径，不能仅凭分组名称断言它一定跟随 AI 组。
 6. **开启 UDP 规则转发。** “设置”→“UDP”→“启用转发”打开，允许端口留空。关闭它会让 UDP 绕过配置直连。这是每台设备的应用设置，导入 `.conf` 不会自动开启。
 7. **检查隧道。** 支持该选项的版本，在“设置”→“隧道”开启“包括所有网络”，保留正常局域网访问；不要开启会让默认路由绕开隧道的代理兼容模式。不同系统版本文字可能略有区别。
-8. **连接后验收。** 按下文检查域名规则、实际日志和出口。每台设备都要检查，不能把一台设备的结果当作全部设备的结果。
+8. **macOS 优先使用 TUN 模式。** 在提供该选项的版本中，进入“设置”→“代理”→“代理类型”，选择 **None（TUN Mode）**。这里的 None 表示不设置系统 HTTP 代理，仍需保持 Shadowrocket VPN 已连接、全局路由为“配置”。iOS 或其他版本若没有此入口，不必寻找同名开关，按其 VPN 隧道方式连接即可。
+9. **连接后验收。** 按下文检查域名规则、实际日志和出口。每台设备都要检查，不能把一台设备的结果当作全部设备的结果。
 
 订阅节点、别名、分组选择、UDP 转发、隧道开关属于不同层次。只有复制配置文件，不能完整复制一台设备的运行环境。
+
+## HTTP 与 TUN 怎么选
+
+本配置推荐 macOS 使用 **TUN 模式**，让网页、App、CLI 和媒体请求尽量统一进入规则分流。TUN 在网络层接管隧道覆盖的流量；系统 HTTP 代理依赖应用遵守代理设置，不能单独覆盖所有应用或 UDP。隧道排除路由、应用自身代理和其他 VPN 仍可能改变实际路径。
+
+切换为 TUN 不会自动把流量全部直连，也不会自动固定 AI 出口：`AI` 仍应选择自己的稳定家宽节点，`PROXY` 选择日常代理，国内命中规则走 `DIRECT`。需要保持同一个出口 IP，还取决于节点供应商是否提供固定 IP；节点名称带“家宽”不能证明住宅属性。HTTP 模式有明确兼容需求时也可使用，并应单独验证应用的实际路径。
+
+**TUN 本身不保证 DNS 不泄漏。** 本配置仍依靠分流加密 DNS、普通 DNS 接管及拒绝回落等设置。每台设备导入后都需完成下方验收；手动指定本机 HTTP 代理地址的 CLI 或浏览器扩展，还要检查其独立设置是否与当前模式一致。
 
 ## 自动更新与回滚
 
@@ -104,6 +113,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 | `chatgpt.com`、`api.openai.com`、`files.oaiusercontent.com` | AI |
 | `claude.ai`、`api.anthropic.com`、`platform.claude.com` | AI |
 | `gemini.google.com`、`generativelanguage.googleapis.com` | AI |
+| `antigravity.google.com`、`aiplatform.googleapis.com`、`oauth2.mtls.googleapis.com` | AI |
 | `res.wx.qq.com`、`i0.hdslb.com`、`vfiles.gtimg.cn` | DIRECT |
 | `outlook.office365.com`、`officecdn.microsoft.com` | DIRECT |
 | `github.com`、`www.google.com`、`example.org` | PROXY |
@@ -112,9 +122,13 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 
 如果站点提供出口回显，可以对照实际 IP、地区及运营商。单凭节点名称或 IP 归属不能证明住宅线路，HTTP 403 也不单独等于路由失败。不要公开真实 IP、节点地址、访问日志或账户截图。验收完成后关闭临时日志。
 
+可使用 [BrowserLeaks DNS 测试](https://browserleaks.com/dns) 检查浏览器发出的随机域名查询，再对照 SR 的 DNS 日志。页面显示的公网 IP 是网页连接出口，DNS 服务器列表是解析出口，两者应分别判断。如果检测站在个人规则中被设为 DIRECT，页面可能显示本地公网 IP；这不能单独证明 DNS 泄漏。解析服务器的 IPv6 地址也不等于本机存在 IPv6 旁路。
+
 常见问题：
 
 - **刚导入无法访问境外**：检查两个节点别名、两组是否还选着 REJECT、首页默认代理、全局路由是否为“配置”。
+- **节点测速通过，但国内外网页都打不开**：CONNECT 测试不能替代真实网页请求。先对照 DNS 日志与连接日志；macOS 若本机 HTTP 代理入口超时，而 TUN 路径正常，可改用上述 None（TUN Mode）后刷新网页。保持 VPN 连接与“配置”路由，再实测国内外网页，不能仅凭这一症状判定为 DNS 故障。
+- **新版域名仍落到默认代理**：仓库或云端更新不代表本机已生效。手动更新远程配置，确认当前选中的是新版，再检查实际连接日志。
 - **国内图片或视频慢**：查看具体资源域名，不只看网站主页；有些 CDN 使用海外地址。为确认可直连的域名添加精确规则，再测，避免整段云网络直连。
 - **微软服务直连失败**：各地区线路不同。Fork 后移除 `rules/direct.list` 中相应例外，并检查国内上游表是否还有同域规则，再构建；或添加优先级更高的精确 PROXY 规则。
 - **AI 登录地区不一致**：检查 AI 组、共享登录域名、应用缓存和真实出口；固定选择稳定节点，避免自动测速频繁换地区。
