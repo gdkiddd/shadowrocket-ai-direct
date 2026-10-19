@@ -93,10 +93,10 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 
 - ChatGPT 网页/应用、OpenAI API、Codex 与 Sora 的核心域名、上传与静态资源、部分认证/支付/挑战资源、官方语音 IPv4 快照。
 - Claude 网页/应用、Anthropic API 与 Claude Code 相关核心域名。
-- Gemini 网页、AI Studio、Gemini API、CLI 入口、Google 登录，以及 Antigravity、DeepMind、NotebookLM、Google Labs 和语音相关域名。
+- Gemini 网页、AI Studio、Gemini API、CLI 入口，以及 Antigravity、NotebookLM 和相关语音域名。Google 通用登录与 OAuth、DeepMind 官网及 Google Labs 走默认代理。
 - 常见国内网站/应用 CDN 及微软 Office、Outlook、登录、下载和更新的直连例外。
 
-共享域名会影响其他使用同一域名的服务，例如 Google 登录、Cloudflare 验证、Stripe 脚本。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 AI 组**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
+共享域名会影响其他使用同一域名的服务，例如 Cloudflare 验证、Stripe 脚本。Google 登录与 OAuth 是多个产品共用的认证入口，按默认代理处理，即使由 Gemini 等 AI 服务跳转过去也不会改走 AI 组。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 AI 组**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
 
 ### 国内 AI 直连策略
 
@@ -113,7 +113,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 | `chatgpt.com`、`api.openai.com`、`files.oaiusercontent.com` | AI |
 | `claude.ai`、`api.anthropic.com`、`platform.claude.com` | AI |
 | `gemini.google.com`、`generativelanguage.googleapis.com` | AI |
-| `antigravity.google.com`、`aiplatform.googleapis.com`、`oauth2.mtls.googleapis.com` | AI |
+| `antigravity.google.com`、`aiplatform.googleapis.com` | AI |
 | `res.wx.qq.com`、`i0.hdslb.com`、`vfiles.gtimg.cn` | DIRECT |
 | `outlook.office365.com`、`officecdn.microsoft.com` | DIRECT |
 | `github.com`、`www.google.com`、`example.org` | PROXY |

@@ -40,8 +40,8 @@ class ConfigTests(unittest.TestCase):
 
     def test_extended_google_ai(self):
         for host in ['antigravity.google', 'antigravity-unleash.goog',
-                     'deepmind.google', 'notebooklm.google', 'notebooklm.google.com',
-                     'labs.google', 'voice.telephony.goog']:
+                     'notebooklm.google', 'notebooklm.google.com',
+                     'voice.telephony.goog']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), 'AI')
                 self.assertEqual(self.route('api.' + host), 'AI')
@@ -65,9 +65,8 @@ class ConfigTests(unittest.TestCase):
                      'files.oaiusercontent.com', 'cdn.oaistatic.com',
                      'claude.ai', 'api.anthropic.com', 'platform.claude.com',
                      'gemini.google.com', 'generativelanguage.googleapis.com',
-                     'cloudcode-pa.googleapis.com', 'accounts.google.com',
+                     'cloudcode-pa.googleapis.com',
                      'antigravity.google.com', 'aiplatform.googleapis.com',
-                     'oauth2.mtls.googleapis.com',
                      'challenges.cloudflare.com']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), 'AI')
@@ -81,7 +80,10 @@ class ConfigTests(unittest.TestCase):
                 self.assertEqual(self.route(host), 'DIRECT')
 
     def test_unknown_and_google_are_proxy(self):
-        for host in ['example.org', 'www.google.com', 'github.com',
+        for host in ['accounts.google.com', 'oauth2.googleapis.com',
+                     'oauth2.mtls.googleapis.com', 'openidconnect.googleapis.com',
+                     'deepmind.google', 'labs.google',
+                     'example.org', 'www.google.com', 'github.com',
                      'copilot.microsoft.com', 'chatgpt.com.example.org',
                      'gemini.google.com.example.org']:
             with self.subTest(host=host):
