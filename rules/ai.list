@@ -46,26 +46,40 @@ DOMAIN-SUFFIX,claudeusercontent.com
 DOMAIN-SUFFIX,claudemcpclient.com
 DOMAIN,servd-anthropic-website.b-cdn.net
 # Gemini / AI Studio / Gemini API / CLI
-DOMAIN,gemini.google.com
+DOMAIN-SUFFIX,gemini.google.com
+DOMAIN-SUFFIX,gemini.google
+DOMAIN,gemini.gstatic.com
 DOMAIN,bard.google.com
 DOMAIN,aistudio.google.com
 DOMAIN,ai.google.dev
 DOMAIN-SUFFIX,makersuite.google.com
 DOMAIN-SUFFIX,generativeai.google
 DOMAIN-SUFFIX,generativelanguage.googleapis.com
-DOMAIN,cloudcode-pa.googleapis.com
-DOMAIN,aiplatform.googleapis.com
+DOMAIN-SUFFIX,aiplatform.googleapis.com
 DOMAIN,alkalicore-pa.clients6.google.com
 DOMAIN,alkalimakersuite-pa.clients6.google.com
-DOMAIN,proactivebackend-pa.googleapis.com
-DOMAIN,geller-pa.googleapis.com
+DOMAIN,alkalimakersuiteapplets.pa.googleapis.com
+DOMAIN,robinfrontend-pa.googleapis.com
+DOMAIN,robinfrontend-pa.mtls.googleapis.com
+DOMAIN,webchannel-robinfrontend-pa.googleapis.com
+DOMAIN,webchannel-robinfrontend-pa.mtls.googleapis.com
+DOMAIN,preprod-robinfrontend-pa.googleapis.com
+DOMAIN-SUFFIX,proactivebackend-pa.googleapis.com
+DOMAIN-SUFFIX,geller-pa.googleapis.com
+DOMAIN-SUFFIX,geminicli.com
 # Shared Google sign-in / OAuth uses the default PROXY policy.
 
 
 # Antigravity / NotebookLM use the same AI egress.
 DOMAIN-SUFFIX,antigravity.google
-DOMAIN,antigravity.google.com
+DOMAIN-SUFFIX,antigravity.google.com
 DOMAIN-SUFFIX,antigravity-unleash.goog
+DOMAIN,daily-cloudcode-pa.googleapis.com
+DOMAIN,cloudcode-pa.googleapis.com
+DOMAIN,aicode.googleapis.com
+DOMAIN,antigravity-cli-auto-updater-974169037036.us-central1.run.app
+DOMAIN-SUFFIX,codeassist.google
+DOMAIN-SUFFIX,codeassist.google.com
 DOMAIN-SUFFIX,notebooklm.google
 DOMAIN-SUFFIX,notebooklm.google.com
 DOMAIN-SUFFIX,voice.telephony.goog

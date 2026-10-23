@@ -39,9 +39,11 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(self.text, (ROOT / 'ai-direct.conf').read_text())
 
     def test_extended_google_ai(self):
-        for host in ['antigravity.google', 'antigravity-unleash.goog',
-                     'notebooklm.google', 'notebooklm.google.com',
-                     'voice.telephony.goog']:
+        for host in ['antigravity.google', 'antigravity.google.com',
+                     'antigravity-unleash.goog', 'gemini.google',
+                     'codeassist.google', 'codeassist.google.com',
+                     'geminicli.com', 'notebooklm.google',
+                     'notebooklm.google.com', 'voice.telephony.goog']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), 'AI')
                 self.assertEqual(self.route('api.' + host), 'AI')
@@ -64,8 +66,12 @@ class ConfigTests(unittest.TestCase):
         for host in ['chatgpt.com', 'ws.chatgpt.com', 'api.openai.com',
                      'files.oaiusercontent.com', 'cdn.oaistatic.com',
                      'claude.ai', 'api.anthropic.com', 'platform.claude.com',
-                     'gemini.google.com', 'generativelanguage.googleapis.com',
-                     'cloudcode-pa.googleapis.com',
+                     'gemini.google.com', 'share.gemini.google',
+                     'gemini.gstatic.com', 'robinfrontend-pa.googleapis.com',
+                     'webchannel-robinfrontend-pa.googleapis.com',
+                     'generativelanguage.googleapis.com',
+                     'daily-cloudcode-pa.googleapis.com',
+                     'cloudcode-pa.googleapis.com', 'aicode.googleapis.com',
                      'antigravity.google.com', 'aiplatform.googleapis.com',
                      'challenges.cloudflare.com']:
             with self.subTest(host=host):
