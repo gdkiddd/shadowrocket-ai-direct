@@ -556,6 +556,7 @@
 .biligame.com
 .biligame.net
 .biligo.com
+.biliimg.com
 .biliintl.com
 .bilivideo.com
 .bilivideo.net
@@ -1526,6 +1527,7 @@
 .hddolby.com
 .hdhome.org
 .hdslb.com
+.hdslb.net
 .hdslb.org
 .hdyxgame.com
 .healthjd.com
