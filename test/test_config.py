@@ -130,7 +130,12 @@ class ConfigTests(unittest.TestCase):
         self.assertIn('香港节点 = url-test,', self.text)
         self.assertIn('policy-regex-filter=香港', self.text)
         self.assertIn('固定家宽 = url-test,', self.text)
-        self.assertIn('policy-regex-filter=家宽|ISP|住宅', self.text)
+        self.assertNotIn('policy-regex-filter=家宽|ISP|住宅', self.text)
+        # 固定家宽 must not carry any policy-regex-filter
+        import re as _re
+        m=_re.search(r'^固定家宽 = (.+)$', self.text, _re.M)
+        self.assertIsNotNone(m)
+        self.assertNotIn('policy-regex-filter', m.group(1))
         self.assertIn('核心AI = fallback,固定家宽,REJECT', self.text)
         self.assertIn('🐟 漏网之鱼 = select,PROXY', self.text)
         self.assertNotIn('美国VPS', self.text)

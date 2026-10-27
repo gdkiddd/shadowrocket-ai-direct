@@ -5,7 +5,7 @@
     "revision": "933875d42861a7fdfd9f945cd18605d74fa7e943",
     "path": "rule/Shadowrocket/China/China_Domain.list",
     "license": "GPL-2.0-only",
-    "sha256": "d35eec789ae09a6d2b6dd48ed2c52d6d811f433b1e73a92b2f9246b778fa7923"
+    "sha256": "b309acaf448b2a2d2849d41623ecf2611129c30cf9a1d5d0a022b164dd68d313"
   },
   "voice": {
     "url": "https://openai.com/chatgpt-voice.json",
