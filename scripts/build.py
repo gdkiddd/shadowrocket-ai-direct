@@ -15,9 +15,9 @@ def lines(path):
 def build():
     result = [(ROOT / 'data/base.conf').read_text().rstrip()]
     rules = []
-    rules += [s + ',AI' for s in lines('rules/ai.list')]
+    rules += [s + ',核心AI' for s in lines('rules/ai.list')]
     # Official OpenAI voice server IP snapshot; add before all geographic rules.
-    rules += ['IP-CIDR,' + str(ipaddress.ip_network(s)) + ',AI,no-resolve'
+    rules += ['IP-CIDR,' + str(ipaddress.ip_network(s)) + ',核心AI,no-resolve'
               for s in lines('data/openai-voice-cidrs.txt')]
     rules += ['DOMAIN,localhost,DIRECT', 'DOMAIN-SUFFIX,local,DIRECT',
               'DOMAIN-SUFFIX,home.arpa,DIRECT']

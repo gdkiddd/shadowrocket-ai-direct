@@ -45,8 +45,8 @@ class ConfigTests(unittest.TestCase):
                      'geminicli.com', 'notebooklm.google',
                      'notebooklm.google.com', 'voice.telephony.goog']:
             with self.subTest(host=host):
-                self.assertEqual(self.route(host), 'AI')
-                self.assertEqual(self.route('api.' + host), 'AI')
+                self.assertEqual(self.route(host), '核心AI')
+                self.assertEqual(self.route('api.' + host), '核心AI')
                 self.assertEqual(self.route(host + '.example.org'), 'PROXY')
 
     def test_domestic_ai(self):
@@ -75,7 +75,7 @@ class ConfigTests(unittest.TestCase):
                      'antigravity.google.com', 'aiplatform.googleapis.com',
                      'challenges.cloudflare.com']:
             with self.subTest(host=host):
-                self.assertEqual(self.route(host), 'AI')
+                self.assertEqual(self.route(host), '核心AI')
 
     def test_domestic_resources_and_microsoft(self):
         for host in ['res.wx.qq.com', 'i0.hdslb.com', 'upos-sz-mirrorcos.bilivideo.com',
@@ -102,7 +102,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_voice_ips_ai(self):
         for prefix in builder.lines('data/openai-voice-cidrs.txt'):
-            self.assertEqual(self.route(ip=str(ipaddress.ip_network(prefix).network_address)), 'AI')
+            self.assertEqual(self.route(ip=str(ipaddress.ip_network(prefix).network_address)), '核心AI')
 
     def test_config_structure(self):
         self.assertEqual(re.findall(r'^\[([^]]+)\]', self.text, re.M),
@@ -117,7 +117,7 @@ class ConfigTests(unittest.TestCase):
                 self.assertRegex(args[0], r'^[a-z0-9_.-]+$')
             if t == 'IP-CIDR':
                 ipaddress.ip_network(args[0])
-            self.assertIn(args[0] if t == 'FINAL' else args[1], ['AI', 'PROXY', 'DIRECT', 'REJECT'])
+            self.assertIn(args[0] if t == 'FINAL' else args[1], ['核心AI', 'PROXY', 'DIRECT', 'REJECT', '香港节点', '固定家宽', '美国VPS', '🐟 漏网之鱼'])
 
     def test_dns_settings_and_groups(self):
         for key in ['dns-fallback-system', 'dns-direct-system', 'dns-direct-fallback-proxy', 'ipv6']:
@@ -127,8 +127,19 @@ class ConfigTests(unittest.TestCase):
         for line in self.text.splitlines():
             if line.startswith(('dns-server =', 'fallback-dns-server =')):
                 self.assertTrue(all(u.strip().endswith('#proxy') for u in line.split(' = ')[1].split(',')))
-        self.assertIn('AI = select,REJECT,AI-NODE,policy-select-name=REJECT', self.text)
+        self.assertIn('香港节点 = url-test,', self.text)
+        self.assertIn('固定家宽 = fallback,家宽-NODE,REJECT', self.text)
+        self.assertIn('美国VPS = select,REJECT,VPS-NODE,policy-select-name=REJECT', self.text)
+        self.assertIn('核心AI = fallback,固定家宽,REJECT', self.text)
         self.assertIn('PROXY = select,REJECT,PROXY-NODE,policy-select-name=REJECT', self.text)
+        self.assertIn('🐟 漏网之鱼 = select,PROXY', self.text)
+        # Public artifact must not embed private subscription node names/IPs.
+        self.assertNotIn('AT&T', self.text)
+        self.assertNotIn('resip', self.text.lower())
+        self.assertNotIn('12.104.15.', self.text)
+        self.assertNotIn('CF-TROJAN', self.text)
+        self.assertNotIn('ZGO-LA-', self.text)
+        self.assertNotIn('WEBSHARE', self.text)
 
     def test_public_artifact_has_no_credentials_or_personal_paths(self):
         self.assertNotRegex(self.text, r'(?im)^(?:password|token|secret|ca-p12|ca-passphrase)\s*=')
