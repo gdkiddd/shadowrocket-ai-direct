@@ -47,7 +47,7 @@ class ConfigTests(unittest.TestCase):
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), '核心AI')
                 self.assertEqual(self.route('api.' + host), '核心AI')
-                self.assertEqual(self.route(host + '.example.org'), 'PROXY')
+                self.assertEqual(self.route(host + '.example.org'), '🐟 漏网之鱼')
 
     def test_domestic_ai(self):
         for host in ['api.deepseek.com', 'www.kimi.com', 'api.moonshot.ai',
@@ -93,7 +93,7 @@ class ConfigTests(unittest.TestCase):
                      'copilot.microsoft.com', 'chatgpt.com.example.org',
                      'gemini.google.com.example.org']:
             with self.subTest(host=host):
-                self.assertEqual(self.route(host), 'PROXY')
+                self.assertEqual(self.route(host), '🐟 漏网之鱼')
 
     def test_plain_dns_fails_closed_before_geographic_rules(self):
         self.assertEqual(self.rules[0], 'DST-PORT,53,REJECT')
@@ -108,7 +108,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(re.findall(r'^\[([^]]+)\]', self.text, re.M),
                          ['General', 'Proxy Group', 'Rule', 'Host'])
         self.assertEqual(len(self.rules), len(set(self.rules)))
-        self.assertEqual(self.rules[-2:], ['GEOIP,CN,DIRECT', 'FINAL,PROXY'])
+        self.assertEqual(self.rules[-2:], ['GEOIP,CN,DIRECT', 'FINAL,🐟 漏网之鱼'])
         self.assertLess(len(self.rules), 6000)
         for rule in self.rules:
             t, *args = rule.split(',')
@@ -117,7 +117,7 @@ class ConfigTests(unittest.TestCase):
                 self.assertRegex(args[0], r'^[a-z0-9_.-]+$')
             if t == 'IP-CIDR':
                 ipaddress.ip_network(args[0])
-            self.assertIn(args[0] if t == 'FINAL' else args[1], ['核心AI', 'PROXY', 'DIRECT', 'REJECT', '香港节点', '固定家宽', '美国VPS', '🐟 漏网之鱼'])
+            self.assertIn(args[0] if t == 'FINAL' else args[1], ['核心AI', 'PROXY', 'DIRECT', 'REJECT', '香港节点', '固定家宽', '🐟 漏网之鱼'])
 
     def test_dns_settings_and_groups(self):
         for key in ['dns-fallback-system', 'dns-direct-system', 'dns-direct-fallback-proxy', 'ipv6']:
@@ -128,11 +128,16 @@ class ConfigTests(unittest.TestCase):
             if line.startswith(('dns-server =', 'fallback-dns-server =')):
                 self.assertTrue(all(u.strip().endswith('#proxy') for u in line.split(' = ')[1].split(',')))
         self.assertIn('香港节点 = url-test,', self.text)
-        self.assertIn('固定家宽 = fallback,家宽-NODE,REJECT', self.text)
-        self.assertIn('美国VPS = select,REJECT,VPS-NODE,policy-select-name=REJECT', self.text)
+        self.assertIn('policy-regex-filter=香港', self.text)
+        self.assertIn('固定家宽 = url-test,', self.text)
+        self.assertIn('policy-regex-filter=家宽|ISP|住宅', self.text)
         self.assertIn('核心AI = fallback,固定家宽,REJECT', self.text)
-        self.assertIn('PROXY = select,REJECT,PROXY-NODE,policy-select-name=REJECT', self.text)
         self.assertIn('🐟 漏网之鱼 = select,PROXY', self.text)
+        self.assertNotIn('美国VPS', self.text)
+        self.assertNotIn('PROXY =', self.text.split('[Proxy Group]')[1].split('[Rule]')[0])
+        self.assertNotIn('家宽-NODE', self.text)
+        self.assertNotIn('VPS-NODE', self.text)
+        self.assertNotIn('PROXY-NODE', self.text)
         # Public artifact must not embed private subscription node names/IPs.
         self.assertNotIn('AT&T', self.text)
         self.assertNotIn('resip', self.text.lower())

@@ -33,7 +33,7 @@ def build():
             rules.append('DOMAIN,' + domain + ',DIRECT')
     result += list(dict.fromkeys(rules))
     result += ['# IP geography is a fallback, not a guarantee for every CDN.',
-               'GEOIP,CN,DIRECT', 'FINAL,PROXY', '', '[Host]',
+               'GEOIP,CN,DIRECT', 'FINAL,🐟 漏网之鱼', '', '[Host]',
                'localhost = 127.0.0.1', 'localhost.weixin.qq.com = 127.0.0.1']
     return '\n'.join(result) + '\n'
 
