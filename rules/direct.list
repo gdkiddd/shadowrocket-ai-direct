@@ -1,6 +1,7 @@
 # Small explicit additions; no personal banking, broker, game or device exceptions.
 DOMAIN-SUFFIX,cn
 DOMAIN-SUFFIX,deepseek.com
+DOMAIN-SUFFIX,deepseeksvc.com
 DOMAIN-SUFFIX,kimi.com
 DOMAIN-SUFFIX,kimi.ai
 DOMAIN-SUFFIX,moonshot.ai
