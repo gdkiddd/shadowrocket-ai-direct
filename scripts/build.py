@@ -53,6 +53,14 @@ def build_core_ai():
     return '\n'.join(dict.fromkeys(out)) + '\n'
 
 
+def build_hongkong():
+    out = header('hongkong',
+                 'HK egress: exchanges, brokers, wallets and cross-border payments.',
+                 'rules/hongkong.list')
+    out += body('rules/hongkong.list')
+    return '\n'.join(dict.fromkeys(out)) + '\n'
+
+
 def build_direct_extra():
     out = header('direct-extra',
                  'Domestic AI and Microsoft productivity / update exceptions that ChinaMax misses or covers poorly.',
@@ -79,6 +87,7 @@ def build_china_ips():
 def build_rulesets():
     return {
         'core-ai.list': build_core_ai(),
+        'hongkong.list': build_hongkong(),
         'direct-extra.list': build_direct_extra(),
         'china-domains.list': build_china_domains(),
         'china-ips.list': build_china_ips(),
@@ -96,6 +105,7 @@ def rule_section():
               '# Remote rule sets: refreshed by the client without rewriting this file,',
               '# so local proxy groups and hand-picked nodes survive rule updates.',
               f'RULE-SET,{RAW}/{RULESET_DIR}/core-ai.list,核心AI',
+              f'RULE-SET,{RAW}/{RULESET_DIR}/hongkong.list,香港节点',
               f'RULE-SET,{RAW}/{RULESET_DIR}/direct-extra.list,DIRECT',
               f'DOMAIN-SET,{RAW}/{RULESET_DIR}/china-domains.list,DIRECT',
               f'RULE-SET,{RAW}/{RULESET_DIR}/china-ips.list,DIRECT',

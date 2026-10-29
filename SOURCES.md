@@ -29,11 +29,17 @@ ChinaMax 是上游对大陆可直连站点的宽口径集合（约 11 万条域�
 
 登录、支付、验证及支持资源可能被其他服务共享。匹配相同域名的其他应用也会走 AI 分组。第三方 MCP、插件、链接访问、Vertex AI、Bedrock、Azure 及自定义 API 中转不在本项目的完整覆盖承诺内。
 
+## 香港节点
+
+`rules/hongkong.list` 是本项目自行维护的域名事实清单，不复制上游规则集文件：主流交易所（Binance、OKX、Gate、Bybit、Bitget、HTX、KuCoin、MEXC、Coinbase、Kraken、Bitfinex、BitMEX）、钱包（TokenPocket 等）、券商（老虎证券、富途 / Moomoo、长桥）、跨境支付（PayPal / Braintree、Wise）与行情站点（CoinGecko、CoinMarketCap、TradingView、Etherscan、BscScan）。构建后发布为 `rulesets/hongkong.list`，由主配置以 `RULE-SET` 指向 `香港节点`。
+
+条目只使用 `DOMAIN` / `DOMAIN-SUFFIX`，不使用关键词匹配；域名增减以实际登录、行情与支付请求的日志为依据。该清单位于 `core-ai` 之后、国内直连表之前：`js.stripe.com` 继续由 `core-ai` 精确规则命中 `核心AI`，其余 `stripe.com` 走香港；若某个域名同时出现在 ChinaMax 中，香港规则优先，因此券商等域名不再被国内表直连。
+
 ## 更新方式
 
 `data/sources.json` 保存国内域名表、国内 IP 表的固定提交和 SHA-256（两者分别对应 `data/china-domains.txt`、`data/china-ips.txt` 的原始字节）。升级时先核对上游许可证及差异，更新本地快照和摘要，再运行构建与测试。不会定时自动抓取并发布未经审查的上游变化。`rules/direct.list` 只保留上游未覆盖或项目特别需要的直连例外（如国内 AI 与微软办公），与 ChinaMax 完全重复的后缀会被删除。
 
-`rules/ai.list`、`rules/direct.list`、`data/base.conf`、`data/*.txt` 是可审查源文件；`kidstudio.conf`、`ai-direct.conf` 与 `rulesets/*.list` 是构建产物。维护记录以 Git 提交和 Release 为准。
+`rules/ai.list`、`rules/hongkong.list`、`rules/direct.list`、`data/base.conf`、`data/*.txt` 是可审查源文件；`kidstudio.conf`、`ai-direct.conf` 与 `rulesets/*.list` 是构建产物。维护记录以 Git 提交和 Release 为准。
 
 客户端侧的更新边界：规则改动只影响 `rulesets/`，在 Shadowrocket 里对当前配置点「使用配置」/重新编译即可刷新规则集，本地手选的 `固定家宽` 节点与分组设置保留；点「更新配置」会整份覆盖 `kidstudio.conf`，把本地分组和节点选择一起压平，应避免。
 
@@ -41,10 +47,11 @@ ChinaMax 是上游对大陆可直连站点的宽口径集合（约 11 万条域�
 
 ```text
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/core-ai.list
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/hongkong.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/direct-extra.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-domains.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-ips.list
 ```
 
-`core-ai.list`、`direct-extra.list`、`china-ips.list` 为 Shadowrocket `RULE-SET` 格式，行内不带策略名；`china-domains.list` 为 `DOMAIN-SET`。策略由引用它们的配置行决定，规则集本身不含节点、订阅或凭证。
+`core-ai.list`、`hongkong.list`、`direct-extra.list`、`china-ips.list` 为 Shadowrocket `RULE-SET` 格式，行内不带策略名；`china-domains.list` 为 `DOMAIN-SET`。策略由引用它们的配置行决定，规则集本身不含节点、订阅或凭证。刷新规则时对配置点「使用配置」（重新编译），不要点「更新配置」整文件覆盖。
 

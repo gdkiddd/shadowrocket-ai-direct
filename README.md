@@ -12,10 +12,11 @@
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.conf
 ```
 
-它引用的四个远程规则集：
+它引用的五个远程规则集：
 
 ```text
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/core-ai.list          # RULE-SET → 核心AI
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/hongkong.list         # RULE-SET → 香港节点
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/direct-extra.list     # RULE-SET → DIRECT
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-domains.list    # DOMAIN-SET → DIRECT
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-ips.list        # RULE-SET → DIRECT
@@ -28,7 +29,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/c
 | 流量 | 策略 |
 | --- | --- |
 | 核心 AI、相关认证与必要共享资源、公开的 OpenAI 语音 IP | `核心AI` → `固定家宽`（在 App 内自行选择/测速家宽节点，无正则筛选） |
-| 需走香港线路的指定规则（如部分金融） | `香港节点`（按节点名正则「香港」自动测速） |
+| 香港规则集：交易所、券商、钱包、跨境支付、行情站 | `香港节点`（按节点名正则「香港」自动测速） |
 | 局域网、国内域名表、`.cn`、常见国内 AI、微软办公与更新例外 | `DIRECT` |
 | 其他目的 IP 命中中国 GeoIP | `DIRECT` |
 | 其余流量 | `🐟 漏网之鱼` → Shadowrocket 内置 `PROXY` |
@@ -44,29 +45,30 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/c
 
 | 层 | 内容 | 何时变化 |
 | --- | --- | --- |
-| `kidstudio.conf` | `[General]`、四个代理分组、局域网/明文 DNS 规则、四条远程规则集引用 | 仅当分组结构或设置需要调整时 |
-| `rulesets/*.list` | 核心 AI、国内 AI 与微软例外、国内域名、国内 IP | 日常规则维护几乎都在这一层 |
+| `kidstudio.conf` | `[General]`、四个代理分组、局域网/明文 DNS 规则、五条远程规则集引用 | 仅当分组结构或设置需要调整时 |
+| `rulesets/*.list` | 核心 AI、香港节点、国内 AI 与微软例外、国内域名、国内 IP | 日常规则维护几乎都在这一层 |
 
 **改规则只是改了规则集，不需要重下整份配置。** 在 Shadowrocket 中对这份配置点「**使用配置**」（部分版本叫「编译配置」/重新载入），让客户端重新拉取并编译规则集即可；你自己在 `固定家宽` 里手动选的节点、分组顺序、首页默认代理都会保留。
 
 **不要点「更新配置」**（整文件覆盖）。它会重新下载整份 `kidstudio.conf`，把你手动改过的分组、节点选择和本地修改一起压平；本配置把大表移到规则集，正是为了避免这种覆盖造成损失。
 
-首次导入后如果只想彻底摆脱整文件覆盖，可以把这份配置留作本地副本（或去掉其自动更新地址），后续只刷新规则集；也可以不使用本项目配置，直接把下面四行贴进你已有的本地配置的 `[Rule]` 段，按顺序放在 `GEOIP,CN` 与 `FINAL` 之前：
+首次导入后如果只想彻底摆脱整文件覆盖，可以把这份配置留作本地副本（或去掉其自动更新地址），后续只刷新规则集；也可以不使用本项目配置，直接把下面五行贴进你已有的本地配置的 `[Rule]` 段，按顺序放在 `GEOIP,CN` 与 `FINAL` 之前：
 
 ```text
 RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/core-ai.list,核心AI
+RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/hongkong.list,香港节点
 RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/direct-extra.list,DIRECT
 DOMAIN-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-domains.list,DIRECT
 RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-ips.list,DIRECT
 ```
 
-用这种方式时，`核心AI` 分组需指向你的家宽节点；每行最后一个字段是策略名（`核心AI` 或 `DIRECT`），可改成你配置里已有的分组名。规则集不含任何节点、订阅或凭证信息。
+用这种方式时，`核心AI` 分组需指向你的家宽节点；每行最后一个字段是策略名（`核心AI`、`香港节点` 或 `DIRECT`），可改成你配置里已有的分组名。`core-ai` 必须放在 `hongkong` 之前，`js.stripe.com` 才会继续留在 `核心AI`；`hongkong` 放在 `direct-extra` / `china-domains` 之前，避免部分券商域名被国内表直连。规则集不含任何节点、订阅或凭证信息。
 
 ## 首次配置：按顺序操作
 
 1. **备份原配置。** 在 Shadowrocket 中保留旧文件。新配置有问题时直接切回旧文件，不要删除原订阅。
 2. **准备节点（不要把真实订阅节点写进开源配置）。** 先导入你自己的节点订阅。`固定家宽` 无正则筛选，在分组里自行选定稳定住宅/家宽出口（TCP；语音还需 UDP）。`香港节点` 仍用正则「香港」选取。订阅刷新可能重置名称，优先用本地副本。
-3. **导入配置 URL。** 底部“配置”→ 右上角“＋”→ 填入上面的 Raw 地址并下载；点击下载后的 `kidstudio.conf` →“使用配置”。首次编译会同时拉取四个规则集，需要能访问 GitHub Raw。不要把配置 URL 填进首页的节点订阅栏。
+3. **导入配置 URL。** 底部“配置”→ 右上角“＋”→ 填入上面的 Raw 地址并下载；点击下载后的 `kidstudio.conf` →“使用配置”。首次编译会同时拉取五个规则集，需要能访问 GitHub Raw。不要把配置 URL 填进首页的节点订阅栏。
 4. **选择分组。** 在 `固定家宽` 中选定家宽节点，确认 `核心AI` 指向 `固定家宽`；`🐟 漏网之鱼` 指向内置 `PROXY`。若想以后更新规则时不覆盖这些选择，按上一节关闭整文件更新、只用「使用配置」刷新规则集。
 5. **全局路由选“配置”。** 首页默认节点选一个有效日常代理（内置 `PROXY` 会用它）；带 `#proxy` 的 DNS 使用代理解析路径，不能仅凭分组名称断言它一定跟随 `核心AI`。
 6. **开启 UDP 规则转发。** “设置”→“UDP”→“启用转发”打开，允许端口留空。关闭它会让 UDP 绕过配置直连。这是每台设备的应用设置，导入 `.conf` 不会自动开启。
@@ -130,9 +132,10 @@ RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/r
 - ChatGPT 网页/应用、OpenAI API、Codex 与 Sora 的核心域名、上传与静态资源、部分认证/支付/挑战资源、官方语音 IPv4 快照。
 - Claude 网页/应用、Anthropic API 与 Claude Code 相关核心域名。
 - Gemini 网页、AI Studio、Gemini API、CLI 入口，以及 Antigravity、NotebookLM 和相关语音域名。Google 通用登录与 OAuth、DeepMind 官网及 Google Labs 走默认代理。
+- 香港出口清单（`rulesets/hongkong.list`）：Binance、OKX、Gate、Bybit、Bitget、HTX、KuCoin、MEXC、Coinbase、Kraken、Bitfinex、BitMEX 等交易所，TokenPocket 等钱包，老虎证券、富途 / Moomoo、长桥等券商，PayPal / Braintree、Wise 等跨境支付，以及 CoinGecko、CoinMarketCap、TradingView、Etherscan、BscScan 等行情与浏览器站点。只写域名后缀，不含关键词规则。
 - 大陆常见站点与 CDN：以 blackmatrix7 的 ChinaMax（约 11 万条域名后缀）和 ChinaIPs（约 2 万条 IPv4 网段）离线快照生成远程规则集，主配置通过 `DOMAIN-SET` / `RULE-SET` 引用；`GEOIP,CN,DIRECT` 仅作兜底；微软 Office、Outlook、登录、下载和更新另有直连例外。
 
-共享域名会影响其他使用同一域名的服务，例如 Cloudflare 验证、Stripe 脚本。Google 登录与 OAuth 是多个产品共用的认证入口，按默认代理处理，即使由 Gemini 等 AI 服务跳转过去也不会改走 `核心AI`。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 `核心AI`**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
+共享域名会影响其他使用同一域名的服务，例如 Cloudflare 验证、Stripe 脚本。`js.stripe.com` 在 `core-ai.list` 里以精确域名保留给 `核心AI`，其余 `stripe.com` 后缀走 `香港节点`；如果你的 ChatGPT 付款环节出现异常，优先检查这两条规则的先后顺序。Google 登录与 OAuth 是多个产品共用的认证入口，按默认代理处理，即使由 Gemini 等 AI 服务跳转过去也不会改走 `核心AI`。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 `核心AI`**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
 
 ### 国内 AI 直连策略
 
@@ -150,6 +153,9 @@ RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/r
 | `claude.ai`、`api.anthropic.com`、`platform.claude.com` | AI |
 | `gemini.google.com`、`generativelanguage.googleapis.com` | AI |
 | `antigravity.google.com`、`aiplatform.googleapis.com` | AI |
+| `js.stripe.com` | AI（core-ai 在前，优先于香港节点） |
+| `www.binance.com`、`www.okx.com`、`www.tigerbrokers.com`、`www.futunn.com` | 香港节点 |
+| `stripe.com`、`tokenpocket.pro`、`paypal.com`、`wise.com` | 香港节点 |
 | `res.wx.qq.com`、`i0.hdslb.com`、`vfiles.gtimg.cn` | DIRECT |
 | `outlook.office365.com`、`officecdn.microsoft.com` | DIRECT |
 | `github.com`、`www.google.com`、`example.org` | 🐟 漏网之鱼（内置 PROXY） |
@@ -179,6 +185,7 @@ RULE-SET,https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/r
 kidstudio.conf                瘦主配置（设置 + 分组 + 远程规则集引用，约 3 KB）
 ai-direct.conf                同内容兼容别名
 rulesets/core-ai.list         核心 AI 规则集（RULE-SET，无策略名）
+rulesets/hongkong.list        香港节点规则集（RULE-SET，无策略名）
 rulesets/direct-extra.list    国内 AI / 微软直连例外（RULE-SET，无策略名）
 rulesets/china-domains.list   ChinaMax 国内域名快照（DOMAIN-SET）
 rulesets/china-ips.list       ChinaIPs 国内 IP 段快照（RULE-SET，无策略名）
@@ -189,6 +196,7 @@ data/china-ips.txt             ChinaIPs 国内 IP 段快照（blackmatrix7，构
 data/openai-voice-cidrs.txt    官方语音 IPv4 快照
 data/sources.json              来源版本与摘要
 rules/ai.list                  核心 AI 域名
+rules/hongkong.list            香港节点域名（交易所 / 券商 / 钱包 / 跨境支付 / 行情）
 rules/direct.list              国内与微软直连补充
 scripts/build.py               无网络、无第三方依赖的确定性构建
 test/test_config.py            分流顺序、规则集引用、DNS、防误匹配与隐私格式检查
@@ -200,7 +208,7 @@ python3 scripts/build.py --check
 python3 -m unittest discover -s test -v
 ```
 
-修改源文件后重新生成主配置与 `rulesets/`，两者都要提交：规则集是发布产物，不只是中间文件。`--check` 会同时校验主配置、兼容别名和四个规则集。CI 只做静态回归，不连接真实节点，也不等于 iOS/macOS 实机验收。首个公开模板未替换任何现有设备的配置；使用者需要按上面的步骤完成自己网络环境的验收。
+修改源文件后重新生成主配置与 `rulesets/`，两者都要提交：规则集是发布产物，不只是中间文件。`--check` 会同时校验主配置、兼容别名和五个规则集。CI 只做静态回归，不连接真实节点，也不等于 iOS/macOS 实机验收。首个公开模板未替换任何现有设备的配置；使用者需要按上面的步骤完成自己网络环境的验收。
 
 提交 Issue 时只提供公开域名、脱敏的规则命中结果、系统/客户端版本和复现步骤。不要上传个人配置、订阅链接、凭证或原始流量。来源、固定版本和许可证详见 [SOURCES.md](SOURCES.md)。
 

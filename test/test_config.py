@@ -113,6 +113,7 @@ class ConfigTests(unittest.TestCase):
         raw = builder.RAW + '/rulesets/'
         expected = [
             f'RULE-SET,{raw}core-ai.list,核心AI',
+            f'RULE-SET,{raw}hongkong.list,香港节点',
             f'RULE-SET,{raw}direct-extra.list,DIRECT',
             f'DOMAIN-SET,{raw}china-domains.list,DIRECT',
             f'RULE-SET,{raw}china-ips.list,DIRECT',
@@ -127,7 +128,7 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual(order, sorted(order))
 
     def test_rulesets_are_policy_free(self):
-        for name in ['core-ai.list', 'direct-extra.list', 'china-ips.list']:
+        for name in ['core-ai.list', 'hongkong.list', 'direct-extra.list', 'china-ips.list']:
             with self.subTest(ruleset=name):
                 entries = [l for l in (ROOT / 'rulesets' / name).read_text().splitlines()
                            if l and not l.startswith('#')]
@@ -180,6 +181,24 @@ class ConfigTests(unittest.TestCase):
                      'challenges.cloudflare.com']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), '核心AI')
+
+    def test_hongkong_routes(self):
+        for host in ['www.binance.com', 'api.binance.com', 'stripe.com',
+                     'api.stripe.com', 'tokenpocket.pro', 'www.tigerbrokers.com',
+                     'www.okx.com', 'www.gate.io', 'www.bybit.com', 'www.bitget.com',
+                     'www.htx.com', 'www.kucoin.com', 'www.mexc.com',
+                     'www.coinbase.com', 'www.kraken.com', 'www.paypal.com',
+                     'wise.com', 'www.futunn.com', 'www.moomoo.com',
+                     'www.longbridge.com', 'www.tradingview.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), '香港节点')
+        # core-ai runs first and pins the ChatGPT payment iframe explicitly.
+        self.assertEqual(self.route('js.stripe.com'), '核心AI')
+        # Domestic and catch-all policies are unaffected by the new set.
+        for host in ['www.baidu.com', 'api.deepseek.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'DIRECT')
+        self.assertEqual(self.route('github.com'), '🐟 漏网之鱼')
 
     def test_domestic_resources_and_microsoft(self):
         for host in ['res.wx.qq.com', 'i0.hdslb.com', 'upos-sz-mirrorcos.bilivideo.com',
