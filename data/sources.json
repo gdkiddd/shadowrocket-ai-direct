@@ -1,11 +1,18 @@
 {
-  "checked_at": "2026-10-17",
+  "checked_at": "2026-10-28",
   "china": {
     "repository": "https://github.com/blackmatrix7/ios_rule_script",
-    "revision": "933875d42861a7fdfd9f945cd18605d74fa7e943",
-    "path": "rule/Shadowrocket/China/China_Domain.list",
+    "revision": "0b6897dc17e0c513d25449c935a9694818e32f0c",
+    "path": "rule/Shadowrocket/ChinaMax/ChinaMax_Domain.list",
     "license": "GPL-2.0-only",
-    "sha256": "b309acaf448b2a2d2849d41623ecf2611129c30cf9a1d5d0a022b164dd68d313"
+    "sha256": "c0d54d3e4ee613e4b8cf92d81474ee94240c870864c633628104b5129b2bcc6e"
+  },
+  "china_ips": {
+    "repository": "https://github.com/blackmatrix7/ios_rule_script",
+    "revision": "0b6897dc17e0c513d25449c935a9694818e32f0c",
+    "path": "rule/Shadowrocket/ChinaIPs/ChinaIPs.list",
+    "license": "GPL-2.0-only",
+    "sha256": "068191975e515bfdc5b9cf16e9f4bd413bf981cb59b76c1c7eb698ce07746247"
   },
   "voice": {
     "url": "https://openai.com/chatgpt-voice.json",

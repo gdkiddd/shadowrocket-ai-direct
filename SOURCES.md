@@ -2,17 +2,17 @@
 
 本项目采用 **GPL-2.0-only**。完整许可条款见 [LICENSE](LICENSE)。分发修改版本时请保留许可证、来源说明并提供对应源文件。项目不提供代理节点，不属于任何 AI 服务或 Shadowrocket 官方项目。
 
-## 国内域名快照
+## 国内域名与 IP 快照
 
 - 作者：blackmatrix7 及其上游贡献者。
 - 仓库：[blackmatrix7/ios_rule_script](https://github.com/blackmatrix7/ios_rule_script)。
-- 固定提交：`933875d42861a7fdfd9f945cd18605d74fa7e943`。
-- 文件：[China_Domain.list](https://github.com/blackmatrix7/ios_rule_script/blob/933875d42861a7fdfd9f945cd18605d74fa7e943/rule/Shadowrocket/China/China_Domain.list)。
-- 原样保存在 `data/china-domains.txt`；该文件头的更新时间属于上游，不等于本项目核验日期。
+- 固定提交：`0b6897dc17e0c513d25449c935a9694818e32f0c`。
+- 域名文件：[ChinaMax_Domain.list](https://github.com/blackmatrix7/ios_rule_script/blob/0b6897dc17e0c513d25449c935a9694818e32f0c/rule/Shadowrocket/ChinaMax/ChinaMax_Domain.list)，原样保存在 `data/china-domains.txt`；该文件头的更新时间属于上游，不等于本项目核验日期。
+- IP 文件：[ChinaIPs.list](https://github.com/blackmatrix7/ios_rule_script/blob/0b6897dc17e0c513d25449c935a9694818e32f0c/rule/Shadowrocket/ChinaIPs/ChinaIPs.list)，仅提取其中的 `IP-CIDR` 网段（去注释、去重、保持上游顺序），存入 `data/china-ips.txt`。
 - 上游声明 GPL-2.0；本仓库保留其完整 LICENSE。更早的来源可查上游文件与仓库历史。
-- 构建时把前导点域名转换为 `DOMAIN-SUFFIX`，普通域名转换为 `DOMAIN`，附加 `DIRECT` 并去重。
+- 构建时把前导点域名转换为 `DOMAIN-SUFFIX`，普通域名转换为 `DOMAIN`，IP 转换为 `IP-CIDR,…,DIRECT,no-resolve`，整体去重。
 
-该表表示上游选择的大陆可直连站点，包含部分国际站点与国内 CDN 例外，不代表所有域名均属于中国，也不保证每个地区当前都能直连。项目不在设备运行时加载它的远程 URL。
+ChinaMax 是上游对大陆可直连站点的宽口径集合（约 11 万条域名后缀），ChinaIPs 是配套的大陆 IP 段集合（约 2 万条网段）。两者仍以离线快照形式编入 `kidstudio.conf`，运行时不会请求远程 `RULE-SET` / `DOMAIN-SET`。该表包含部分国际站点与国内 CDN 例外，不代表所有域名均属于中国，也不保证每个地区当前都能直连；`GEOIP,CN,DIRECT` 只作为兜底。
 
 ## 核心 AI
 
@@ -29,7 +29,7 @@
 
 ## 更新方式
 
-`data/sources.json` 保存国内表的固定提交和 SHA-256。升级时先核对上游许可证及差异，更新本地快照和摘要，再运行构建与测试。不会定时自动抓取并发布未经审查的上游变化。
+`data/sources.json` 保存国内域名表、国内 IP 表的固定提交和 SHA-256（两者分别对应 `data/china-domains.txt`、`data/china-ips.txt` 的原始字节）。升级时先核对上游许可证及差异，更新本地快照和摘要，再运行构建与测试。不会定时自动抓取并发布未经审查的上游变化。`rules/direct.list` 只保留上游未覆盖或项目特别需要的直连例外（如国内 AI 与微软办公），与 ChinaMax 完全重复的后缀会被删除。
 
 `rules/ai.list`、`rules/direct.list`、`data/base.conf` 是可审查源文件；`kidstudio.conf` 是可直接导入的合并产物。维护记录以 Git 提交和 Release 为准。
 

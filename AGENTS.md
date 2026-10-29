@@ -6,6 +6,8 @@ Instructions for coding agents working on this repository.
 
 Offline, searchable Shadowrocket config for routing core AI traffic via a dedicated `固定家宽` group and domestic sites via `DIRECT`. Public artifacts must never embed private subscription nodes, IPs, UUIDs, or passwords.
 
+Domestic coverage is vendored, not linked: ChinaMax domain suffixes (`data/china-domains.txt`) and ChinaIPs IPv4 ranges (`data/china-ips.txt`) are compiled into the artifacts, so the output must never contain `RULE-SET`/`DOMAIN-SET` or fetch upstream tables at runtime.
+
 ## Source of truth and publish path
 
 - Edit reviewable sources under `data/` and `rules/`, then run `python3 scripts/build.py` (writes both `kidstudio.conf` and legacy alias `ai-direct.conf`).
@@ -34,7 +36,7 @@ Never reintroduce `美国VPS`, a custom `PROXY =` group, or private `*-NODE` pla
 
 ## Typical change flow
 
-1. Change `data/base.conf`, `rules/*.list`, or `data/china-domains.txt` (update `data/sources.json` sha256 when the china domain snapshot bytes change).
+1. Change `data/base.conf`, `rules/*.list`, `data/china-domains.txt` or `data/china-ips.txt` (update the matching `data/sources.json` sha256 when either ChinaMax or ChinaIPs snapshot bytes change).
 2. `python3 scripts/build.py && python3 -m unittest discover -s test -v`
 3. Commit and push to `main`. Tag a Release when the change should be pinned (e.g. `v1.1.x`).
 4. Tell the maintainer to refresh the remote config in Shadowrocket (or re-import Raw URL). Do not push to R2.

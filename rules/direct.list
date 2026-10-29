@@ -11,7 +11,6 @@ DOMAIN-SUFFIX,qwen.ai
 DOMAIN-SUFFIX,tongyi.com
 DOMAIN-SUFFIX,doubao.com
 DOMAIN-SUFFIX,volcengine.com
-DOMAIN-SUFFIX,xiaohongshu.com
 # Domestic AI providers: web, API and known resource domains.
 DOMAIN-SUFFIX,deepseek.cn
 DOMAIN-SUFFIX,moonshot.cn
@@ -29,7 +28,6 @@ DOMAIN-SUFFIX,coze.com
 DOMAIN-SUFFIX,jianying.com
 DOMAIN-SUFFIX,baidu.com
 DOMAIN-SUFFIX,baidubce.com
-DOMAIN-SUFFIX,tencent.com
 DOMAIN-SUFFIX,hunyuan.com
 DOMAIN-SUFFIX,xf-yun.com
 DOMAIN-SUFFIX,xfyun.cn
@@ -51,18 +49,13 @@ DOMAIN-SUFFIX,msauth.net
 DOMAIN-SUFFIX,msauthimages.net
 DOMAIN-SUFFIX,msftauth.net
 DOMAIN-SUFFIX,msftauthimages.net
-DOMAIN-SUFFIX,officecdn.microsoft.com
 DOMAIN-SUFFIX,officecdn-microsoft-com.akamaized.net
 DOMAIN-SUFFIX,download.microsoft.com
-DOMAIN-SUFFIX,update.microsoft.com
 DOMAIN-SUFFIX,windowsupdate.com
-DOMAIN-SUFFIX,windowsupdate.microsoft.com
 DOMAIN-SUFFIX,delivery.mp.microsoft.com
 DOMAIN-SUFFIX,msftconnecttest.com
 DOMAIN-SUFFIX,msftncsi.com
-DOMAIN,cn.bing.com
 DOMAIN,login.live.com
 DOMAIN,account.live.com
 DOMAIN,outlook.live.com
-DOMAIN,portal.partner.microsoftonline.cdnsvc.com
 

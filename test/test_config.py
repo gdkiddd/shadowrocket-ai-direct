@@ -17,22 +17,41 @@ class ConfigTests(unittest.TestCase):
         cls.text = (ROOT / 'kidstudio.conf').read_text()
         cls.rules = [l for l in cls.text.split('[Rule]\n')[1].split('[Host]')[0].splitlines()
                      if l and not l.startswith('#')]
+        # Pre-index rule types so route() stays fast against the ~130k-rule table
+        # while keeping first-match-wins order across rule types.
+        cls.exact, cls.suffix, cls.ports, cls.cidrs, cls.final = {}, {}, [], [], None
+        for i, line in enumerate(cls.rules):
+            t, *parts = line.split(',')
+            if t == 'DOMAIN':
+                cls.exact.setdefault(parts[0], (i, parts[1]))
+            elif t == 'DOMAIN-SUFFIX':
+                cls.suffix.setdefault(parts[0], (i, parts[1]))
+            elif t == 'DST-PORT':
+                cls.ports.append((i, int(parts[0]), parts[1]))
+            elif t == 'IP-CIDR':
+                cls.cidrs.append((i, ipaddress.ip_network(parts[0]), parts[1]))
+            elif t == 'FINAL':
+                cls.final = (i, parts[0])
 
     def route(self, host='', ip=None, port=443):
         # Small policy-order regression model, not a Shadowrocket emulator.
-        for line in self.rules:
-            t, *parts = line.split(',')
-            if t == 'DST-PORT' and int(parts[0]) == port:
-                return parts[1]
-            if t == 'DOMAIN' and host == parts[0]:
-                return parts[1]
-            if t == 'DOMAIN-SUFFIX' and (host == parts[0] or host.endswith('.' + parts[0])):
-                return parts[1]
-            if t == 'IP-CIDR' and ip and ipaddress.ip_address(ip) in ipaddress.ip_network(parts[0]):
-                return parts[1]
-            if t == 'FINAL':
-                return parts[0]
-        self.fail('No final rule')
+        hits = []
+        if host:
+            if host in self.exact:
+                hits.append(self.exact[host])
+            labels = host.split('.')
+            for n in range(len(labels)):
+                hit = self.suffix.get('.'.join(labels[n:]))
+                if hit:
+                    hits.append(hit)
+        hits += [(i, policy) for i, p, policy in self.ports if p == port]
+        if ip:
+            addr = ipaddress.ip_address(ip)
+            hits += [(i, policy) for i, net, policy in self.cidrs if addr in net]
+        if hits:
+            return min(hits)[1]
+        self.assertEqual(self.final[0], len(self.rules) - 1, 'No final rule')
+        return self.final[1]
 
     def test_reproducible(self):
         self.assertEqual(self.text, builder.build())
@@ -109,7 +128,7 @@ class ConfigTests(unittest.TestCase):
                          ['General', 'Proxy Group', 'Rule', 'Host'])
         self.assertEqual(len(self.rules), len(set(self.rules)))
         self.assertEqual(self.rules[-2:], ['GEOIP,CN,DIRECT', 'FINAL,🐟 漏网之鱼'])
-        self.assertLess(len(self.rules), 6000)
+        self.assertLess(len(self.rules), 200000)
         for rule in self.rules:
             t, *args = rule.split(',')
             self.assertIn(t, ['DOMAIN', 'DOMAIN-SUFFIX', 'DST-PORT', 'IP-CIDR', 'GEOIP', 'FINAL'])
@@ -161,8 +180,11 @@ class ConfigTests(unittest.TestCase):
     def test_upstream_snapshot_hash(self):
         import hashlib
         info = json.loads((ROOT / 'data/sources.json').read_text())
-        self.assertEqual(hashlib.sha256((ROOT / 'data/china-domains.txt').read_bytes()).hexdigest(),
-                         info['china']['sha256'])
+        for key, path in [('china', 'data/china-domains.txt'),
+                          ('china_ips', 'data/china-ips.txt')]:
+            with self.subTest(snapshot=key):
+                self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
+                                 info[key]['sha256'])
 
 
 if __name__ == '__main__':

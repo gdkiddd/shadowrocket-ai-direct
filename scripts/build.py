@@ -31,6 +31,9 @@ def build():
             rules.append('DOMAIN-SUFFIX,' + domain[1:] + ',DIRECT')
         else:
             rules.append('DOMAIN,' + domain + ',DIRECT')
+    # ChinaIPs snapshot; keeps GEOIP,CN as a coarse fallback only.
+    rules += ['IP-CIDR,' + str(ipaddress.ip_network(s)) + ',DIRECT,no-resolve'
+              for s in lines('data/china-ips.txt')]
     result += list(dict.fromkeys(rules))
     result += ['# IP geography is a fallback, not a guarantee for every CDN.',
                'GEOIP,CN,DIRECT', 'FINAL,🐟 漏网之鱼', '', '[Host]',

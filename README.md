@@ -27,7 +27,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 
 代理分组为 `香港节点` / `固定家宽` / `核心AI` / `🐟 漏网之鱼`。**开源配置只含分组与规则，不写入任何订阅链接、节点地址、UUID 或个人 IP**。`香港节点` 用正则「香港」测速选取；`固定家宽` **不设正则**，在 Shadowrocket 里手动挑选或测速家宽节点；`🐟 漏网之鱼` 直接使用内置 `PROXY`（首页当前选中的代理），配置内不再单独建 `PROXY` / `美国VPS` 分组。
 
-国内域名表来自带许可证的上游快照，包含部分国际服务的直连例外；“国内优先”并不等同于仅按域名后缀判断。GeoIP 是兜底，未知 CDN、海外托管资源仍可能走代理。Google 搜索、GitHub 等未单独列入例外的服务走默认代理；微软也没有整站全部直连。
+国内规则来自带许可证的上游中国域名（ChinaMax）与 IP（ChinaIPs）离线快照，包含部分国际服务的直连例外；“国内优先”并不等同于仅按域名后缀判断。GeoIP 是兜底，未知 CDN、海外托管资源仍可能走代理。Google 搜索、GitHub 等未单独列入例外的服务走默认代理；微软也没有整站全部直连。
 
 ## 首次配置：按顺序操作
 
@@ -97,7 +97,7 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 - ChatGPT 网页/应用、OpenAI API、Codex 与 Sora 的核心域名、上传与静态资源、部分认证/支付/挑战资源、官方语音 IPv4 快照。
 - Claude 网页/应用、Anthropic API 与 Claude Code 相关核心域名。
 - Gemini 网页、AI Studio、Gemini API、CLI 入口，以及 Antigravity、NotebookLM 和相关语音域名。Google 通用登录与 OAuth、DeepMind 官网及 Google Labs 走默认代理。
-- 常见国内网站/应用 CDN 及微软 Office、Outlook、登录、下载和更新的直连例外。
+- 大陆常见站点与 CDN：以 blackmatrix7 的 ChinaMax（约 11 万条域名后缀）和 ChinaIPs（约 2 万条 IPv4 网段）离线快照覆盖，`GEOIP,CN,DIRECT` 仅作兜底；微软 Office、Outlook、登录、下载和更新另有直连例外。
 
 共享域名会影响其他使用同一域名的服务，例如 Cloudflare 验证、Stripe 脚本。Google 登录与 OAuth 是多个产品共用的认证入口，按默认代理处理，即使由 Gemini 等 AI 服务跳转过去也不会改走 `核心AI`。Google 图片/头像 CDN、第三方工具、外链、MCP、下载镜像以及各云平台托管 API 可能走 `PROXY`。本项目优先保持核心会话出口一致，**不承诺页面产生的每一条连接都走 `核心AI`**。新域名和服务端 IP 会变化，请按日志提交最小规则补充，避免添加整个云厂商或宽泛关键词。
 
@@ -146,7 +146,8 @@ https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/kidstudio.
 kidstudio.conf                可导入的长配置文件
 AGENTS.md                     给编码助手的仓库约定（只推 Git、固定家宽无正则等）
 data/base.conf                通用设置与代理分组（香港节点可正则；固定家宽无正则；无私有节点）
-data/china-domains.txt         带归属信息的固定国内域名快照
+data/china-domains.txt         ChinaMax 国内域名后缀快照（blackmatrix7，离线编入）
+data/china-ips.txt             ChinaIPs 国内 IP 段快照（blackmatrix7，离线编入）
 data/openai-voice-cidrs.txt    官方语音 IPv4 快照
 data/sources.json              来源版本与摘要
 rules/ai.list                  核心 AI 域名
