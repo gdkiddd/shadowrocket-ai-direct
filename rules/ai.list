@@ -1,5 +1,5 @@
-# Public service destinations. Policy is appended by scripts/build.py.
-# See SOURCES.md for provenance and coverage limits.
+# Core AI destinations. Rule facts only — the referencing config applies 核心AI.
+# Compiled into rulesets/core-ai.list. See SOURCES.md for provenance and limits.
 # OpenAI / ChatGPT / Codex / Sora
 DOMAIN-SUFFIX,openai.com
 DOMAIN-SUFFIX,chatgpt.com
