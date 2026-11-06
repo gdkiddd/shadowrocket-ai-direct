@@ -41,15 +41,31 @@ def header(name, purpose, source):
             f'# LICENSE: GPL-2.0-only. Details: {RAW}/SOURCES.md']
 
 
-def build_core_ai():
-    out = header('core-ai',
-                 'Core AI traffic (ChatGPT / OpenAI / Codex, Claude / Anthropic, Gemini).',
-                 'rules/ai.list + data/openai-voice-cidrs.txt (openai.com/chatgpt-voice.json)')
-    out += body('rules/ai.list')
+def build_gpt():
+    out = header('gpt',
+                 'ChatGPT / OpenAI / Codex / Sora plus shared login, payment and challenge helpers.',
+                 'rules/gpt.list + data/openai-voice-cidrs.txt (openai.com/chatgpt-voice.json)')
+    out += body('rules/gpt.list')
     out += ['',
             '# Official OpenAI voice server IPs (snapshot; see data/sources.json).',
             '# Placed after the domain rules so the first match stays predictable.']
     out += ['IP-CIDR,' + c + ',no-resolve' for c in cidrs('data/openai-voice-cidrs.txt')]
+    return '\n'.join(dict.fromkeys(out)) + '\n'
+
+
+def build_claude():
+    out = header('claude',
+                 'Claude web / app / Code and Anthropic API traffic.',
+                 'rules/claude.list')
+    out += body('rules/claude.list')
+    return '\n'.join(dict.fromkeys(out)) + '\n'
+
+
+def build_gemini():
+    out = header('gemini',
+                 'Gemini web, AI Studio, Gemini API / CLI, Antigravity, NotebookLM and Code Assist.',
+                 'rules/gemini.list')
+    out += body('rules/gemini.list')
     return '\n'.join(dict.fromkeys(out)) + '\n'
 
 
@@ -86,7 +102,9 @@ def build_china_ips():
 
 def build_rulesets():
     return {
-        'core-ai.list': build_core_ai(),
+        'gpt.list': build_gpt(),
+        'claude.list': build_claude(),
+        'gemini.list': build_gemini(),
         'hongkong.list': build_hongkong(),
         'direct-extra.list': build_direct_extra(),
         'china-domains.list': build_china_domains(),
@@ -94,18 +112,45 @@ def build_rulesets():
     }
 
 
-def rule_section():
+AI_SETS = [('gpt.list', 'GPT'), ('claude.list', 'Claude'), ('gemini.list', 'Gemini')]
+
+
+def inline_ai_rules(sets):
+    """Expand the three AI sets into policy-carrying rules for the local-only conf.
+
+    The thin remote config keeps RULE-SET lines; this variant exists so the
+    config can be tried before the new sets are published to GitHub Raw.
+    """
+    out = ['# 本机内联 AI 规则（GPT / Claude / Gemini），无需 GitHub Raw 也能分流。']
+    for name, policy in AI_SETS:
+        out += ['', f'# {policy} — inline copy of rulesets/{name}']
+        for entry in sets[name].splitlines():
+            if not entry or entry.startswith('#'):
+                continue
+            fields = entry.split(',')
+            if fields[-1] == 'no-resolve':
+                out.append(','.join(fields[:-1] + [policy, 'no-resolve']))
+            else:
+                out.append(','.join(fields + [policy]))
+    return out
+
+
+def rule_section(ai_inline=None):
     rules = ['# Reject plaintext DNS that DNS interception did not capture.',
              'DST-PORT,53,REJECT', '',
              '# Local network and mDNS names bypass the tunnel.',
              'DOMAIN,localhost,DIRECT', 'DOMAIN-SUFFIX,local,DIRECT',
              'DOMAIN-SUFFIX,home.arpa,DIRECT']
     rules += ['IP-CIDR,' + s + ',DIRECT,no-resolve' for s in LAN_IPV4]
-    rules += ['',
-              '# Remote rule sets: refreshed by the client without rewriting this file,',
-              '# so local proxy groups and hand-picked nodes survive rule updates.',
-              f'RULE-SET,{RAW}/{RULESET_DIR}/core-ai.list,核心AI',
-              f'RULE-SET,{RAW}/{RULESET_DIR}/hongkong.list,香港节点',
+    if ai_inline is None:
+        rules += ['',
+                  '# Remote rule sets: refreshed by the client without rewriting this file,',
+                  '# so local proxy groups and hand-picked nodes survive rule updates.']
+        rules += [f'RULE-SET,{RAW}/{RULESET_DIR}/{name},{policy}'
+                  for name, policy in AI_SETS]
+    else:
+        rules += [''] + ai_inline + ['', '# 其余规则集仍从 GitHub Raw 拉取。']
+    rules += [f'RULE-SET,{RAW}/{RULESET_DIR}/hongkong.list,香港节点',
               f'RULE-SET,{RAW}/{RULESET_DIR}/direct-extra.list,DIRECT',
               f'DOMAIN-SET,{RAW}/{RULESET_DIR}/china-domains.list,DIRECT',
               f'RULE-SET,{RAW}/{RULESET_DIR}/china-ips.list,DIRECT',
@@ -115,13 +160,26 @@ def rule_section():
     return list(dict.fromkeys(rules))
 
 
-def build():
+def build(ai_inline=None):
     out = [(ROOT / 'data/base.conf').read_text().rstrip(), '', '[Rule]']
-    out += rule_section()
+    out += rule_section(ai_inline)
     out += ['', '[Host]',
             'localhost = 127.0.0.1',
             'localhost.weixin.qq.com = 127.0.0.1']
     return '\n'.join(out) + '\n'
+
+
+LOCAL_BANNER = [
+    '# 本机试用版（local-only）。勿提交、勿推送：这是未被发布的未来状态。',
+    '# 未上云前请对本文件「使用配置」；AI 规则已内联，香港/直连/国内规则集仍来自 GitHub Raw。',
+    '# 发布后请改用 kidstudio.conf（瘦配置 + 远程 RULE-SET）。',
+]
+
+
+def build_local():
+    """Same shell as the published config, but the three AI sets are inlined."""
+    text = build(inline_ai_rules(build_rulesets()))
+    return '\n'.join(LOCAL_BANNER + ['', text])
 
 
 def targets():
@@ -130,6 +188,16 @@ def targets():
     for name, text in build_rulesets().items():
         out[ROOT / RULESET_DIR / name] = text
     return out
+
+
+def local_targets():
+    text = build_local()
+    return {ROOT / 'kidstudio.local.conf': text,
+            ROOT / 'ai-direct.local.conf': text}
+
+
+def local_path():
+    return ROOT / 'kidstudio.local.conf'
 
 
 if __name__ == '__main__':
@@ -144,8 +212,12 @@ if __name__ == '__main__':
         print(f'All {len(outputs)} generated files match sources')
     else:
         (ROOT / RULESET_DIR).mkdir(exist_ok=True)
+        outputs.update(local_targets())
         for path, text in outputs.items():
             path.write_text(text)
         conf = outputs[ROOT / 'kidstudio.conf']
+        local = outputs[ROOT / 'kidstudio.local.conf']
         print(f'Built {len(outputs)} files; kidstudio.conf: '
               f'{len(conf.splitlines())} lines, {len(conf.encode())} bytes')
+        print(f'Local trial conf: {local_path()} '
+              f'({len(local.splitlines())} lines, {len(local.encode())} bytes)')

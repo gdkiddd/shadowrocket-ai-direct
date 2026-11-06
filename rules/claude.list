@@ -1,0 +1,9 @@
+# Claude destinations: Claude web / app / Code and the Anthropic API. Rule facts only —
+# the referencing config applies Claude. Compiled into rulesets/claude.list.
+DOMAIN-SUFFIX,anthropic.com
+DOMAIN-SUFFIX,claude.ai
+DOMAIN-SUFFIX,claude.com
+DOMAIN-SUFFIX,claudeusercontent.com
+DOMAIN-SUFFIX,claudemcpclient.com
+DOMAIN-SUFFIX,claude.site
+DOMAIN,servd-anthropic-website.b-cdn.net

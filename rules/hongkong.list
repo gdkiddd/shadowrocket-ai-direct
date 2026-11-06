@@ -28,7 +28,7 @@ DOMAIN-SUFFIX,binancezh.cc
 DOMAIN-SUFFIX,binancezh.info
 DOMAIN-SUFFIX,binancezh.net
 DOMAIN-SUFFIX,binancezh.pro
-# Stripe (js.stripe.com for ChatGPT stays in core-ai via earlier RULE-SET)
+# Stripe (js.stripe.com for ChatGPT stays in gpt via earlier RULE-SET)
 DOMAIN-SUFFIX,stripe.com
 DOMAIN-SUFFIX,stripe.network
 DOMAIN-SUFFIX,stripecdn.com

@@ -18,10 +18,10 @@ ChinaMax 是上游对大陆可直连站点的宽口径集合（约 11 万条域�
 
 ## 核心 AI
 
-`rules/ai.list` 按服务划分；只保留需要的域名事实，不复制网页正文。
+按模型拆成三份清单，每份只保留需要的域名事实，不复制网页正文：`rules/gpt.list`（OpenAI / ChatGPT / Codex / Sora 与共享登录、支付、挑战资源）、`rules/claude.list`（Claude / Anthropic）、`rules/gemini.list`（Gemini / AI Studio / Antigravity / NotebookLM / Code Assist）。
 
 - [OpenAI 官方网络建议](https://help.openai.com/en/articles/9247338-network-recommendations-for-chatgpt-errors-on-web-and-apps)：核心域名、登录、静态资源、挑战、部分共享第三方资源、WebSocket 与语音要求。
-- [OpenAI 官方语音地址](https://openai.com/chatgpt-voice.json)：2026-10-17 获取，IPv4 网段转换存入 `data/openai-voice-cidrs.txt`。上游会变化，版本时间和原始响应摘要见 `data/sources.json`。
+- [OpenAI 官方语音地址](https://openai.com/chatgpt-voice.json)：2026-10-17 获取，IPv4 网段转换存入 `data/openai-voice-cidrs.txt`，构建时追加到 `rulesets/gpt.list`。上游会变化，版本时间和原始响应摘要见 `data/sources.json`。
 - [Claude Code 官方网络配置](https://code.claude.com/docs/en/network-config)：Claude / Anthropic API 与认证需求。
 - [Gemini API 官方参考](https://ai.google.dev/api)：`generativelanguage.googleapis.com`。
 - [Gemini CLI 源码](https://github.com/google-gemini/gemini-cli)：CLI 服务入口参考。
@@ -33,25 +33,27 @@ ChinaMax 是上游对大陆可直连站点的宽口径集合（约 11 万条域�
 
 `rules/hongkong.list` 是本项目自行维护的域名事实清单，不复制上游规则集文件：主流交易所（Binance、OKX、Gate、Bybit、Bitget、HTX、KuCoin、MEXC、Coinbase、Kraken、Bitfinex、BitMEX）、钱包（TokenPocket 等）、券商（老虎证券、富途 / Moomoo、长桥）、跨境支付（PayPal / Braintree、Wise）与行情站点（CoinGecko、CoinMarketCap、TradingView、Etherscan、BscScan）。构建后发布为 `rulesets/hongkong.list`，由主配置以 `RULE-SET` 指向 `香港节点`。
 
-条目只使用 `DOMAIN` / `DOMAIN-SUFFIX`，不使用关键词匹配；域名增减以实际登录、行情与支付请求的日志为依据。该清单位于 `core-ai` 之后、国内直连表之前：`js.stripe.com` 继续由 `core-ai` 精确规则命中 `核心AI`，其余 `stripe.com` 走香港；若某个域名同时出现在 ChinaMax 中，香港规则优先，因此券商等域名不再被国内表直连。
+条目只使用 `DOMAIN` / `DOMAIN-SUFFIX`，不使用关键词匹配；域名增减以实际登录、行情与支付请求的日志为依据。该清单位于三份 AI 清单之后、国内直连表之前：`js.stripe.com` 继续由 `gpt.list` 的精确规则命中 `GPT`，其余 `stripe.com` 走香港；若某个域名同时出现在 ChinaMax 中，香港规则优先，因此券商等域名不再被国内表直连。
 
 ## 更新方式
 
 `data/sources.json` 保存国内域名表、国内 IP 表的固定提交和 SHA-256（两者分别对应 `data/china-domains.txt`、`data/china-ips.txt` 的原始字节）。升级时先核对上游许可证及差异，更新本地快照和摘要，再运行构建与测试。不会定时自动抓取并发布未经审查的上游变化。`rules/direct.list` 只保留上游未覆盖或项目特别需要的直连例外（如国内 AI 与微软办公），与 ChinaMax 完全重复的后缀会被删除。
 
-`rules/ai.list`、`rules/hongkong.list`、`rules/direct.list`、`data/base.conf`、`data/*.txt` 是可审查源文件；`kidstudio.conf`、`ai-direct.conf` 与 `rulesets/*.list` 是构建产物。维护记录以 Git 提交和 Release 为准。
+`rules/gpt.list`、`rules/claude.list`、`rules/gemini.list`、`rules/hongkong.list`、`rules/direct.list`、`data/base.conf`、`data/*.txt` 是可审查源文件；`kidstudio.conf`、`ai-direct.conf` 与 `rulesets/*.list` 是构建产物；`kidstudio.local.conf` / `ai-direct.local.conf` 是本机试用产物（已 `.gitignore`，不发布）。维护记录以 Git 提交和 Release 为准。
 
 客户端侧的更新边界：规则改动只影响 `rulesets/`，在 Shadowrocket 里对当前配置点「使用配置」/重新编译即可刷新规则集，本地手选的 `固定家宽` 节点与分组设置保留；点「更新配置」会整份覆盖 `kidstudio.conf`，把本地分组和节点选择一起压平，应避免。
 
 ## 规则集地址
 
 ```text
-https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/core-ai.list
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/gpt.list
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/claude.list
+https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/gemini.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/hongkong.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/direct-extra.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-domains.list
 https://raw.githubusercontent.com/gdkiddd/shadowrocket-ai-direct/main/rulesets/china-ips.list
 ```
 
-`core-ai.list`、`hongkong.list`、`direct-extra.list`、`china-ips.list` 为 Shadowrocket `RULE-SET` 格式，行内不带策略名；`china-domains.list` 为 `DOMAIN-SET`。策略由引用它们的配置行决定，规则集本身不含节点、订阅或凭证。刷新规则时对配置点「使用配置」（重新编译），不要点「更新配置」整文件覆盖。
+`gpt.list`、`claude.list`、`gemini.list`、`hongkong.list`、`direct-extra.list`、`china-ips.list` 为 Shadowrocket `RULE-SET` 格式，行内不带策略名；`china-domains.list` 为 `DOMAIN-SET`。策略由引用它们的配置行决定，规则集本身不含节点、订阅或凭证。刷新规则时对配置点「使用配置」（重新编译），不要点「更新配置」整文件覆盖。
 

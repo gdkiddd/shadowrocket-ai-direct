@@ -1,0 +1,37 @@
+# GPT destinations: OpenAI / ChatGPT / Codex / Sora. Rule facts only — the referencing config applies GPT.
+# Compiled into rulesets/gpt.list. See SOURCES.md for provenance and limits.
+# OpenAI / ChatGPT / Codex / Sora
+DOMAIN-SUFFIX,openai.com
+DOMAIN-SUFFIX,chatgpt.com
+DOMAIN-SUFFIX,oaistatic.com
+DOMAIN-SUFFIX,oaiusercontent.com
+DOMAIN-SUFFIX,oaistatsig.com
+DOMAIN-SUFFIX,sora.com
+DOMAIN-SUFFIX,chat.com
+DOMAIN,cdn.openaimerge.com
+DOMAIN,openaicom.imgix.net
+# ChatGPT web SSO (WorkOS) — exact hosts only, not *.workos.com
+DOMAIN,cdn.workos.com
+DOMAIN,forwarder.workos.com
+DOMAIN,frontend-apps-multi-region.workos.com
+DOMAIN,images.workoscdn.com
+DOMAIN,setup.workos.com
+DOMAIN,workos.imgix.net
+# ChatGPT payment iframe (must stay ahead of hongkong stripe.com)
+DOMAIN,js.stripe.com
+# OpenAI-specific CDN / captcha / storage / realtime helpers
+DOMAIN,chat.openai.com.cdn.cloudflare.net
+DOMAIN,openai-api.arkoselabs.com
+# Cloudflare Turnstile / challenge (also used by Claude); pinned to AI egress so
+# the challenge IP matches chatgpt.com / claude.ai. GPT runs first, so it lands here.
+DOMAIN,challenges.cloudflare.com
+DOMAIN,openaicom-api-bdcpf8c6d2e9atf6.z01.azurefd.net
+DOMAIN,openaicomproductionae4b.blob.core.windows.net
+DOMAIN,production-openaicom-storage.azureedge.net
+DOMAIN-SUFFIX,openaiapi-site.azureedge.net
+DOMAIN-SUFFIX,chatgpt.livekit.cloud
+# OpenAI Sentry project ingest (org-scoped hosts)
+DOMAIN,o207216.ingest.sentry.io
+DOMAIN,o33249.ingest.sentry.io
+# Voice: official OpenAI voice IPv4 ranges are appended by scripts/build.py
+# from data/openai-voice-cidrs.txt (openai.com/chatgpt-voice.json); keep IPs out of this file.

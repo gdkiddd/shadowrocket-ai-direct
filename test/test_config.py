@@ -10,9 +10,11 @@ spec = importlib.util.spec_from_file_location('build', ROOT / 'scripts/build.py'
 builder = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(builder)
 
-POLICIES = ['核心AI', 'DIRECT', 'REJECT', '🐟 漏网之鱼', '香港节点', '固定家宽']
+POLICIES = ['GPT', 'Claude', 'Gemini', 'DIRECT', 'REJECT', '🐟 漏网之鱼', '香港节点', '固定家宽']
 LAN_IPV4 = ['10.0.0.0/8', '127.0.0.0/8', '169.254.0.0/16',
             '172.16.0.0/12', '192.168.0.0/16']
+LOCAL_CONF = ROOT / 'kidstudio.local.conf'
+AI_POLICIES = ['GPT', 'Claude', 'Gemini']
 
 
 def section(text, name):
@@ -98,6 +100,8 @@ class ConfigTests(unittest.TestCase):
         for name, text in generated.items():
             with self.subTest(ruleset=name):
                 self.assertEqual(text, (ROOT / 'rulesets' / name).read_text())
+        if LOCAL_CONF.exists():
+            self.assertEqual(LOCAL_CONF.read_text(), builder.build_local())
 
     def test_conf_is_thin(self):
         lines = self.text.splitlines()
@@ -112,7 +116,9 @@ class ConfigTests(unittest.TestCase):
     def test_remote_rulesets_and_policies(self):
         raw = builder.RAW + '/rulesets/'
         expected = [
-            f'RULE-SET,{raw}core-ai.list,核心AI',
+            f'RULE-SET,{raw}gpt.list,GPT',
+            f'RULE-SET,{raw}claude.list,Claude',
+            f'RULE-SET,{raw}gemini.list,Gemini',
             f'RULE-SET,{raw}hongkong.list,香港节点',
             f'RULE-SET,{raw}direct-extra.list,DIRECT',
             f'DOMAIN-SET,{raw}china-domains.list,DIRECT',
@@ -123,12 +129,13 @@ class ConfigTests(unittest.TestCase):
                 self.assertIn(line, self.rules)
         self.assertEqual([r for r in self.rules if r.split(',')[0] in
                           ('RULE-SET', 'DOMAIN-SET')], expected)
-        # Order: core AI first, then direct exceptions, then the bulk sets.
+        # Order: AI sets first (gpt keeps js.stripe.com), then hk, then direct bulk.
         order = [self.rules.index(line) for line in expected]
         self.assertEqual(order, sorted(order))
 
     def test_rulesets_are_policy_free(self):
-        for name in ['core-ai.list', 'hongkong.list', 'direct-extra.list', 'china-ips.list']:
+        for name in ['gpt.list', 'claude.list', 'gemini.list', 'hongkong.list',
+                     'direct-extra.list', 'china-ips.list']:
             with self.subTest(ruleset=name):
                 entries = [l for l in (ROOT / 'rulesets' / name).read_text().splitlines()
                            if l and not l.startswith('#')]
@@ -150,8 +157,8 @@ class ConfigTests(unittest.TestCase):
                      'geminicli.com', 'notebooklm.google',
                      'notebooklm.google.com', 'voice.telephony.goog']:
             with self.subTest(host=host):
-                self.assertEqual(self.route(host), '核心AI')
-                self.assertEqual(self.route('api.' + host), '核心AI')
+                self.assertEqual(self.route(host), 'Gemini')
+                self.assertEqual(self.route('api.' + host), 'Gemini')
                 self.assertEqual(self.route(host + '.example.org'), '🐟 漏网之鱼')
 
     def test_domestic_ai(self):
@@ -167,20 +174,49 @@ class ConfigTests(unittest.TestCase):
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), 'DIRECT')
 
-    def test_core_ai_before_direct(self):
+    def test_gpt_before_direct(self):
         for host in ['chatgpt.com', 'ws.chatgpt.com', 'api.openai.com',
                      'files.oaiusercontent.com', 'cdn.oaistatic.com',
-                     'claude.ai', 'api.anthropic.com', 'platform.claude.com',
-                     'gemini.google.com', 'share.gemini.google',
+                     'chatgpt.livekit.cloud', 'js.stripe.com',
+                     'openai-api.arkoselabs.com', 'cdn.workos.com',
+                     'openaicom.imgix.net', 'challenges.cloudflare.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'GPT')
+
+    def test_claude_before_direct(self):
+        for host in ['claude.ai', 'api.anthropic.com', 'platform.claude.com',
+                     'claudeusercontent.com', 'claudemcpclient.com',
+                     'claude.site']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'Claude')
+
+    def test_gemini_before_direct(self):
+        for host in ['gemini.google.com', 'share.gemini.google',
                      'gemini.gstatic.com', 'robinfrontend-pa.googleapis.com',
                      'webchannel-robinfrontend-pa.googleapis.com',
                      'generativelanguage.googleapis.com',
                      'daily-cloudcode-pa.googleapis.com',
                      'cloudcode-pa.googleapis.com', 'aicode.googleapis.com',
                      'antigravity.google.com', 'aiplatform.googleapis.com',
-                     'challenges.cloudflare.com']:
+                     'cloudaicompanion.googleapis.com', 'jules.google.com',
+                     'jules.google']:
             with self.subTest(host=host):
-                self.assertEqual(self.route(host), '核心AI')
+                self.assertEqual(self.route(host), 'Gemini')
+
+
+    def test_apple_direct(self):
+        for host in ['humb.apple.com',
+                     'www.apple.com', 'icloud.com', 'is1-ssl.mzstatic.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), 'DIRECT')
+
+    def test_shared_saas_not_forced_to_gpt(self):
+        # Removed from GPT: generic support / telemetry hosts.
+        for host in ['cdn.intercomcdn.com',
+                     'host.livekit.cloud',
+                     'rum.browser-intake-datadoghq.com']:
+            with self.subTest(host=host):
+                self.assertEqual(self.route(host), '🐟 漏网之鱼')
 
     def test_hongkong_routes(self):
         for host in ['www.binance.com', 'api.binance.com', 'stripe.com',
@@ -192,8 +228,8 @@ class ConfigTests(unittest.TestCase):
                      'www.longbridge.com', 'www.tradingview.com']:
             with self.subTest(host=host):
                 self.assertEqual(self.route(host), '香港节点')
-        # core-ai runs first and pins the ChatGPT payment iframe explicitly.
-        self.assertEqual(self.route('js.stripe.com'), '核心AI')
+        # gpt runs first and pins the ChatGPT payment iframe explicitly.
+        self.assertEqual(self.route('js.stripe.com'), 'GPT')
         # Domestic and catch-all policies are unaffected by the new set.
         for host in ['www.baidu.com', 'api.deepseek.com']:
             with self.subTest(host=host):
@@ -225,7 +261,7 @@ class ConfigTests(unittest.TestCase):
 
     def test_voice_ips_ai(self):
         for prefix in builder.lines('data/openai-voice-cidrs.txt'):
-            self.assertEqual(self.route(ip=str(ipaddress.ip_network(prefix).network_address)), '核心AI')
+            self.assertEqual(self.route(ip=str(ipaddress.ip_network(prefix).network_address)), 'GPT')
 
     def test_lan_and_china_ips_direct(self):
         for net in LAN_IPV4:
@@ -271,7 +307,11 @@ class ConfigTests(unittest.TestCase):
         m = re.search(r'^固定家宽 = (.+)$', self.text, re.M)
         self.assertIsNotNone(m)
         self.assertNotIn('policy-regex-filter', m.group(1))
-        self.assertIn('核心AI = fallback,固定家宽,REJECT', self.text)
+        for group in AI_POLICIES:
+            with self.subTest(group=group):
+                self.assertIn(f'{group} = fallback,固定家宽,REJECT', self.text)
+                self.assertIn('policy-select-name=固定家宽', self.text)
+        self.assertNotIn('核心AI', self.text)
         self.assertIn('🐟 漏网之鱼 = select,PROXY', self.text)
         self.assertNotIn('美国VPS', self.text)
         self.assertNotIn('PROXY =', section(self.text, 'Proxy Group'))
@@ -306,6 +346,61 @@ class ConfigTests(unittest.TestCase):
             with self.subTest(snapshot=key):
                 self.assertEqual(hashlib.sha256((ROOT / path).read_bytes()).hexdigest(),
                                  info[key]['sha256'])
+
+
+@unittest.skipUnless(LOCAL_CONF.exists(), 'kidstudio.local.conf is local-only')
+class LocalConfTests(unittest.TestCase):
+    """The local trial config inlines the three AI sets so it works before publish."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.text = LOCAL_CONF.read_text()
+        cls.rules = [l for l in section(cls.text, 'Rule').splitlines()
+                     if l and not l.startswith('#')]
+
+    def test_banner_and_structure(self):
+        self.assertIn('本机试用', self.text)
+        self.assertIn('勿推送', self.text)
+        self.assertEqual(re.findall(r'^\[([^]]+)\]', self.text, re.M),
+                         ['General', 'Proxy Group', 'Rule', 'Host'])
+        self.assertEqual(len(self.rules), len(set(self.rules)))
+
+    def test_ai_rules_are_inline(self):
+        for rule in ['DOMAIN,js.stripe.com,GPT',
+                     'DOMAIN-SUFFIX,chatgpt.com,GPT',
+                     'DOMAIN-SUFFIX,oaiusercontent.com,GPT',
+                     'DOMAIN-SUFFIX,claude.ai,Claude',
+                     'DOMAIN-SUFFIX,anthropic.com,Claude',
+                     'DOMAIN-SUFFIX,gemini.google.com,Gemini',
+                     'DOMAIN-SUFFIX,notebooklm.google.com,Gemini']:
+            with self.subTest(rule=rule):
+                self.assertIn(rule, self.rules)
+        voice = builder.cidrs('data/openai-voice-cidrs.txt')[0]
+        self.assertIn(f'IP-CIDR,{voice},GPT,no-resolve', self.rules)
+
+    def test_no_remote_ai_sets_but_other_sets_kept(self):
+        sets = [r for r in self.rules if r.split(',')[0] in ('RULE-SET', 'DOMAIN-SET')]
+        self.assertFalse([s for s in sets if re.search(r'/(gpt|claude|gemini|core-ai)\.list,', s)])
+        for name in ['hongkong.list', 'direct-extra.list', 'china-domains.list', 'china-ips.list']:
+            with self.subTest(ruleset=name):
+                self.assertTrue([s for s in sets if name in s])
+        self.assertNotIn('核心AI', self.text)
+
+    def test_ai_inline_precedes_hongkong(self):
+        hk = next(i for i, r in enumerate(self.rules) if 'hongkong.list' in r)
+        for i, rule in enumerate(self.rules):
+            if rule.endswith(('GPT', 'Claude', 'Gemini')):
+                self.assertLess(i, hk, rule)
+
+    def test_policies_are_declared(self):
+        groups = section(self.text, 'Proxy Group')
+        for group in AI_POLICIES:
+            self.assertIn(f'{group} = fallback,固定家宽,REJECT', groups)
+        for line in self.rules[:-1]:
+            fields = line.split(',')
+            if fields[0] in ('DOMAIN', 'DOMAIN-SUFFIX', 'IP-CIDR'):
+                self.assertIn(fields[-2] if fields[-1] == 'no-resolve' else fields[-1],
+                              POLICIES)
 
 
 if __name__ == '__main__':

@@ -8,3 +8,6 @@ __pycache__/
 *.pcap*
 
 .wrangler/
+
+# Local-only trial config (inlines the AI rule sets); never published.
+*.local.conf

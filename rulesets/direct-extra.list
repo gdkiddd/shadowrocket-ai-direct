@@ -45,6 +45,17 @@ DOMAIN-SUFFIX,sensenova.cn
 DOMAIN-SUFFIX,sensetime.com
 DOMAIN-SUFFIX,tiangong.cn
 DOMAIN-SUFFIX,klingai.com
+# Apple device services — keep DIRECT (not GPT/Claude/Gemini).
+DOMAIN,register.appattest.apple.com
+DOMAIN,humb.apple.com
+DOMAIN-SUFFIX,apple.com
+DOMAIN-SUFFIX,icloud.com
+DOMAIN-SUFFIX,icloud.com.cn
+DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,mzstatic.com
+DOMAIN-SUFFIX,apple-cloudkit.com
+DOMAIN-SUFFIX,apple-mapkit.com
+DOMAIN-SUFFIX,aaplimg.com
 # Microsoft productivity, authentication and downloads: direct-first exceptions.
 DOMAIN-SUFFIX,office.com
 DOMAIN-SUFFIX,office.net
